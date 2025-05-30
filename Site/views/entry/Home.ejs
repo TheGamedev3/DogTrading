@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dog Trading - Home</title>
+</head>
+<body style="font-family: sans-serif; margin: 0; padding: 0;">
+
+  <%- include('../shared/Header') %>
+
+  <main style="padding: 2rem;">
+    <h1>🐶 Welcome to Dog Trading!</h1>
+    <p>
+      Trade dogs between each other!
+    </p>
+
+    <ul>
+      <li>Create your own account</li>
+      <li>And Trade Doggies!</li>
+    </ul>
+
+    <% if (!user) { %>
+      <p><strong><a href="/signup">Create an account</a></strong> or <strong><a href="/login">log in</a></strong> to get started!</p>
+    <% } else { %>
+      <p>Welcome back, <%= user.email %>! Go to your <a href="/UserProfile/<%= userId %>">profile</a>.</p>
+    <% } %>
+  </main>
+
+</body>
+</html>

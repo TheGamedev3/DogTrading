@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body>
+  <%- include('../shared/Header') %>
+  <main style="padding: 2rem;">
+    <h2>Log In</h2>
+    <% if (justLoggedIn) { %>
+      <p style="color: green;">✅ Thanks for logging in!</p>
+    <% } %>
+    <form action="/login" method="POST">
+      <input name="email" type="email" placeholder="Email" required><br><br>
+      <input name="password" type="password" placeholder="Password" required><br><br>
+      <button type="submit">Log In</button>
+    </form>
+  </main>
+</body>
+</html>
