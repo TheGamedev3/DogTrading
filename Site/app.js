@@ -10,7 +10,8 @@ const routeCreators = [
     require('./routes/dogRequests'),
     require('./routes/tradeRequests'),
     require('./routes/dataRequests'),
-    require('./routes/webpages')
+    require('./routes/webpages'),
+    require('./routes/pagnator')
 ];
 
 function parseRoute(routeStr) {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dog Trading - All Dogs</title>
+  <title>Dog Trading - <%= pagnatorTitle %></title>
 </head>
 <body style="font-family: sans-serif; margin: 0; padding: 0;">
 
@@ -9,7 +9,7 @@
 
   <main style="padding: 2rem;">
 
-    <h1>All Dogs</h1>
+    <h1><%= pagnatorTitle %></h1>
     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
       <% for (const profile of profiles) { %>
         <%- include('../shared/Icon', profile) %>

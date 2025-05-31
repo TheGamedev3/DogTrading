@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= dog.name || "Unnamed Dog" %> | Dog Profile</title>
+</head>
+<body style="font-family: sans-serif; margin: 0; padding: 0;">
+
+  <%- include('../shared/Header') %>
+
+  <main style="padding: 2rem; max-width: 600px; margin: auto;">
+
+    <h1><%= dog.name || "Unnamed Dog" %></h1>
+
+    <% if (dog.profile) { %>
+      <div style="margin: 1rem 0;">
+        <img src="<%= dog.profile %>" alt="Dog profile picture" style="max-width: 100%; border-radius: 8px; border: 1px solid #ccc;" />
+      </div>
+    <% } else { %>
+      <p><em>No profile picture available.</em></p>
+    <% } %>
+
+    <p><strong>Owner:</strong>
+      <a href="<%= dog.ownerLink %>" style="color: #3366cc;">
+        <%= dog.owner?.name || "Unknown Owner" %>
+      </a>
+    </p>
+
+    <p>
+      <strong>Status:</strong>
+      <% if (dog.traded) { %>
+        <span style="color: green;">Available for Trade</span>
+      <% } else { %>
+        <span style="color: gray;">Not Currently Offered</span>
+      <% } %>
+    </p>
+
+    <% if (myDog) { %>
+      <div style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
+        <h2>This is your dog 🐶</h2>
+        <p>In the future, you’ll be able to manage trades, update their info, or remove them.</p>
+      </div>
+    <% } else { %>
+      <div style="margin-top: 2rem; padding: 1rem; background-color: #f9f9f9; border: 1px solid #ddd;">
+        <p>You are viewing <%= dog.name || "this dog's" %> public profile.</p>
+      </div>
+    <% } %>
+
+  </main>
+
+</body>
+</html>

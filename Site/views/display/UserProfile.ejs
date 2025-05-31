@@ -15,9 +15,15 @@
       </div>
     <% } %>
 
-    <h1>
-      <%= user.name ? user.name : "Unnamed User" %>'s Profile
-    </h1>
+    <h1><%= user.name || "Unnamed Dog" %></h1>
+
+    <% if (user.profile) { %>
+      <div style="margin: 1rem 0;">
+        <img src="<%= user.profile %>" alt="User profile picture" style="width: 200px; border-radius: 8px; border: 1px solid #ccc;" />
+      </div>
+    <% } else { %>
+      <p><em>No profile picture available.</em></p>
+    <% } %>
 
     <p><strong>Email:</strong> <%= user.email %></p>
 
