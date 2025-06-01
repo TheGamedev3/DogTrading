@@ -4,7 +4,7 @@
 const {pagnation} = require('@MongooseAPI');
 const {Owner, Dog, Offer} = require('@Chemicals');
 
-module.exports = function createRoutes(route){
+module.exports = function createRoutes({route}){
     async function pagnate(table, perPage, queries) {
         return await pagnation({
             table: table,

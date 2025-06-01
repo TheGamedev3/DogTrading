@@ -15,7 +15,7 @@
       </div>
     <% } %>
 
-    <h1><%= user.name || "Unnamed Dog" %></h1>
+    <h1><%= username %></h1>
 
     <% if (user.profile) { %>
       <div style="margin: 1rem 0;">
@@ -38,6 +38,20 @@
         <p>You are viewing <%= user.name || "this user's" %> public profile.</p>
       </div>
     <% } %>
+
+    <h1><%= username %>'s offers:</h1>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+      <% for (const profile of myOffers) { %>
+        <%- include('../shared/Icon', profile) %>
+      <% } %>
+    </div>
+
+    <h1><%= username %>'s dogs:</h1>
+    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+      <% for (const profile of myDogs) { %>
+        <%- include('../shared/Icon', profile) %>
+      <% } %>
+    </div>
 
   </main>
 

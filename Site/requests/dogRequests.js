@@ -2,7 +2,7 @@
 
 
 
-module.exports = function createRoutes(route){
+module.exports = function createRoutes({route}){
     route('POST /registerDog', async({inputs, req, json, userId})=>{
         // replace this with an err catcher forum thingy
 

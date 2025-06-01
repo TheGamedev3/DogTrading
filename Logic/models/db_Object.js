@@ -16,6 +16,19 @@ function db_object(name, propTypes, methods, extraSettings={}){
         delete methods.saveAs;
     }
 
+    // custom sorter function
+    schema.query.complexSort = function (sortStyle) {
+        let sortOption = {};
+        switch (sortStyle) {
+            case 'name_asc':  sortOption = { name:  1 }; break;
+            case 'name_desc': sortOption = { name: -1 }; break;
+            case 'newest':    sortOption = { created: -1 }; break;
+            case 'oldest':    sortOption = { created:  1 }; break;
+            default:          sortOption = { created: -1 }; break;
+        }
+        return this.sort(sortOption);
+    };
+
     Object.assign(schema.statics, methods);
 
     return mongoose.model(name, schema);

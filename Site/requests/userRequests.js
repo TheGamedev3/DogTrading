@@ -3,7 +3,7 @@
 
 const {Owner} = require('@Chemicals');
 
-module.exports = function createRoutes(route){
+module.exports = function createRoutes({route}){
     route.preVerified('POST /signup', async({inputs, req, json})=>{
         // replace this with an err catcher forum thingy
 

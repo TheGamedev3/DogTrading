@@ -47,12 +47,12 @@ module.exports = {
             return await this.create(object);
         });
       },
-      async DogsOf(ownerId){
+      async DogsOf(ownerId, sortStyle){
         return await err_catcher(async()=>{
             if(!(await Owner.isReal(ownerId)))
             {throw new FieldError('ownerId', 'Owner does not exist')}
 
-            return await this.find({ owner: ownerId });
+            return await this.find({ owner: ownerId }).complexSort(sortStyle);
         });
       },
       async modify(dogId, props){
@@ -91,6 +91,26 @@ module.exports = {
         const deleted = await this.findByIdAndDelete(dogId);
         if (!deleted) throw new FieldError('dogId', 'Dog does not exist or was already deleted');
         return deleted;
+      },
+
+      async getIconData(dogs){
+        const{Offer} = require('./Offer');
+        await Promise.all(
+            dogs.map(async (dog) => {
+                dog.offer = await Offer.OfferOfDog(dog._id);
+            })
+        );
+        return dogs.map(({
+            profile, name, _id, offer
+          })=>{
+          return{
+              imageSrc: profile,
+              name,
+              link: `/DogProfile/${_id}`,
+              size: 100,
+              topLeft: offer ? '$$$' : ''
+          }}
+        );
       }
 
     }

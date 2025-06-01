@@ -98,6 +98,28 @@ module.exports = {
       // used for debug/seeding
       async createDummy(props){
           return await this.create(props);
+      },
+
+      async getIconData(offers){
+        const{Dog} = require('./Dog');
+        await Promise.all(
+            offers.map(async (offer) => {
+                offer.dog = await Dog.findOne({_id: offer.dog});
+            })
+        );
+        return offers.map((offer)=>{
+            const{
+                profile, name, _id
+            } = offer.dog;
+            return{
+                imageSrc: profile,
+                name,
+                link: `/DogProfile/${_id}`,
+                size: 100,
+                topLeft: '$$$',
+                offer
+            }
+        });
       }
     }
   )

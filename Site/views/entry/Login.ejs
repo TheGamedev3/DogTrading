@@ -5,16 +5,33 @@
 </head>
 <body>
   <%- include('../shared/Header') %>
+
   <main style="padding: 2rem;">
     <h2>Log In</h2>
+
     <% if (justLoggedIn) { %>
       <p style="color: green;">✅ Thanks for logging in!</p>
     <% } %>
+
     <form action="/login" method="POST">
       <input name="email" type="email" placeholder="Email" required><br><br>
       <input name="password" type="password" placeholder="Password" required><br><br>
       <button type="submit">Log In</button>
     </form>
+
+    <div style="margin-top: 2rem; padding: 1rem; background: #f3f3f3; border: 1px solid #ccc;">
+      <p style="margin: 0 0 0.5rem;"><strong>(test-accounts for dev purposes)</strong></p>
+      <ul style="list-style: none; padding-left: 0;">
+        <li><code>ryan@gmail.com</code> / <code>444421</code></li>
+        <li><code>aaron@gmail.com</code> / <code>223121212</code></li>
+        <li><code>sarah@gmail.com</code> / <code>afa655a5</code></li>
+        <li><code>gary@gmail.com</code> / <code>Aaaaa22222</code></li>
+        <li><code>maurice@gmail.com</code> / <code>ZXCVB123</code></li>
+        <li><code>laura@gmail.com</code> / <code>0987654</code></li>
+        <li><code>frank@gmail.com</code> / <code>5%5%123</code></li>
+        <li><code>miranda@gmail.com</code> / <code>!!!!!Abc</code></li>
+      </ul>
+    </div>
   </main>
 </body>
 </html>

@@ -95,6 +95,19 @@ module.exports = {
                 const deleted = await this.findByIdAndDelete(ownerId);
                 if (!deleted) throw new FieldError('ownerId', 'Owner does not exist or was already deleted');
                 return deleted;
+            },
+
+            getIconData(owners){
+                return owners.map(({
+                    profile, name, _id
+                })=>{
+                return{
+                    imageSrc: profile,
+                    name,
+                    link: `/UserProfile/${_id}`,
+                    size: 100,
+                    topLeft: ''
+                }});
             }
         }
     )

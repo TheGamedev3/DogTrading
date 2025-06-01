@@ -3,7 +3,7 @@
 
 const {Dog, Offer} = require('@Chemicals');
 
-module.exports = function createRoutes(route){
+module.exports = function createRoutes({route}){
     
     route('POST /makeOffer/:dogId', async({userId, json, params})=>{
         // use an error catcher thing here later
