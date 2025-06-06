@@ -86,6 +86,16 @@ module.exports = {
                 return await owner.save();
             },
 
+            // used for concatenating all the data needed to display a user's page
+            async pageData(userId){
+                const{Dog, Offer} = require('@Chemicals');
+
+                const pageUser = await this.findOne({ _id: userId }).lean();
+                pageUser.myDogs = await Dog.getIconData(await Dog.DogsOf(pageUser._id, "newest"));
+                pageUser.myOffers = await Offer.getIconData(await Offer.OffersOf(pageUser._id, "newest"));
+                return pageUser;
+            },
+
             // used for debug/seeding
             async createDummy(props){
                 return await this.create(props);

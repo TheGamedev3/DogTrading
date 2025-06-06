@@ -20,7 +20,6 @@ module.exports = function createRoutes({route}){
         try{
             const user = await Owner.login(inputs.email, inputs.password);
             await req.verifyUser(user);
-            console.log(user)
             req.session.justLoggedIn = true;
             return res.redirect(`/UserProfile/${user._id}`);
         }catch(err){

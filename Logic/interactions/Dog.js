@@ -82,6 +82,7 @@ module.exports = {
           return await this.exists({ _id: id });
       },
 
+      // used for concatenating all the data needed to display a dogs's page
       async pageData(dogId){
         const{Owner, Offer} = require('@Chemicals');
 

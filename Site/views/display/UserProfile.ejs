@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= user.name %> | Dog Trading Profile</title>
+  <title><%= pageUser.name %> | Dog Trading Profile</title>
 </head>
 <body style="font-family: sans-serif; margin: 0; padding: 0;">
 
@@ -11,21 +11,21 @@
 
     <% if (justLoggedIn) { %>
       <div style="padding: 1rem; background-color: #d0f0c0; border: 1px solid #8bc34a; margin-bottom: 1rem;">
-        ✅ Thanks for logging in, <%= viewer.name || viewer.email %>!
+        ✅ Thanks for logging in, <%= user.name || user.email %>!
       </div>
     <% } %>
 
-    <h1><%= username %></h1>
+    <h1><%= pageUser.name %></h1>
 
-    <% if (user.profile) { %>
+    <% if (pageUser.profile) { %>
       <div style="margin: 1rem 0;">
-        <img src="<%= user.profile %>" alt="User profile picture" style="width: 200px; border-radius: 8px; border: 1px solid #ccc;" />
+        <img src="<%= pageUser.profile %>" alt="User profile picture" style="width: 200px; border-radius: 8px; border: 1px solid #ccc;" />
       </div>
     <% } else { %>
       <p><em>No profile picture available.</em></p>
     <% } %>
 
-    <p><strong>Email:</strong> <%= user.email %></p>
+    <p><strong>Email:</strong> <%= pageUser.email %></p>
 
     <% if (myProfile) { %>
       <div style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
@@ -35,23 +35,27 @@
       </div>
     <% } else { %>
       <div style="margin-top: 2rem; padding: 1rem; background-color: #f9f9f9; border: 1px solid #ddd;">
-        <p>You are viewing <%= user.name || "this user's" %> public profile.</p>
+        <p>You are viewing <%= pageUser.name || "this user" %>'s public profile.</p>
       </div>
     <% } %>
 
-    <h1><%= username %>'s offers:</h1>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <% for (const profile of myOffers) { %>
-        <%- include('../shared/Icon', profile) %>
-      <% } %>
-    </div>
+    <% if (pageUser.myOffers.length > 0) { %>
+      <h1><%= pageUser.name %>'s offers:</h1>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <% for (const profile of pageUser.myOffers) { %>
+          <%- include('../shared/Icon', profile) %>
+        <% } %>
+      </div>
+    <% } %>
 
-    <h1><%= username %>'s dogs:</h1>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-      <% for (const profile of myDogs) { %>
-        <%- include('../shared/Icon', profile) %>
-      <% } %>
-    </div>
+    <% if (pageUser.myDogs.length > 0) { %>
+      <h1><%= pageUser.name %>'s dogs:</h1>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <% for (const profile of pageUser.myDogs) { %>
+          <%- include('../shared/Icon', profile) %>
+        <% } %>
+      </div>
+    <% } %>
 
   </main>
 

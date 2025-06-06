@@ -19,3 +19,10 @@ tests, (just stub the return page, by just returning the args given to the page 
 
 
 // possibly, a transactions section?
+
+
+edit dog/user profiles, register/create dog
+
+tests
+
+pagnation sorter asker thingy
