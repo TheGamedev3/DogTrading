@@ -1,3 +1,11 @@
+
+<script>
+  // have ejs place in all the client args into here
+  window.args = <%- JSON.stringify(args || {}) %>;
+</script>
+<!-- Load helper script -->
+<script src="/staticHelpers.js"></script>
+
 <header style="padding: 1rem; background: #f5f5f5; border-bottom: 1px solid #ccc;">
   <nav style="display: flex; gap: 1rem;">
     <a href="/home">Home</a>

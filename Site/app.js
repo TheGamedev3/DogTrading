@@ -12,6 +12,8 @@ app.use(CORS);
 
 app.use(
     createVerifier({
+        // verifies the user's session token,
+        // and retrieves their information for requests
         tokenName: 'JWT-Id',
         secretName: process.env.JWT_SECRET,
         rerouteTo: '/home'
@@ -19,8 +21,7 @@ app.use(
 );
 
 // get route creator helpers
-// then pass those to the route creatings
-
+// then pass those to the route creators
 const{createAllRoutes} = require('./routeMaker/routeMaker');
 createAllRoutes(
     require('./requests/userRequests'),

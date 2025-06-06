@@ -15,6 +15,8 @@ module.exports = function createRoutes({PagerPage}){
     // make it so u can edit the dogs if you own them, or your own profile
     // make a person profile info function
 
-    PagerPage('allOffers', 'All Offers', Offer, 6);
+    PagerPage('allOffers', 'All Offers', Offer, 6, {status:'available'});
+
+    // custom sort props also needed like { status: "avaliable" }
 
 };

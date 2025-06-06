@@ -14,10 +14,12 @@ module.exports = function createRoutes({route}){
     });
     route('DELETE /deleteOffer/:offerId', async({userId, json, params})=>{
         // use an error catcher thing here later
+
         return json(200, await Offer.deleteOffer(userId, params.offerId));
     });
     route('POST /buyOffer/:offerId', async({userId, json, params})=>{
         // use an error catcher thing here later
+
         return json(200, await Offer.buyOffer(userId, params.offerId));
     });
 

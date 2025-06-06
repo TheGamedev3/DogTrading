@@ -1,0 +1,38 @@
+  /*
+  document.addEventListener('DOMContentLoaded', () => {
+    
+    const button = document.getElementById('buyButton');
+
+    if (button) {
+      button.addEventListener('click', async () => {
+        setElement('buyButton', { text: 'Processing...', background: 'black' });
+        button.disabled = true;
+
+        try {
+          
+          //const res = await fetch('/buyOffer/<%= dog.offer._id %>', {
+          //  method: 'POST',
+          //  credentials: 'include'
+          //});
+          
+         const res={ok:true}
+         await new Promise(res=>setTimeout(res,5000))
+
+          if (res.ok) {
+            setElement('buyButton', { text: 'Success! 🐾', background: 'green' });
+            //setElement('buyButton', { visible: false });
+            //setElement('buyButton', { text: 'Adopted by You 🫶', background: 'blue' });
+          } else {
+            const msg = await res.text();
+            setElement('buyButton', { text: 'Failed: ' + msg, background: 'red' });
+          }
+        } catch (err) {
+          setElement('buyButton', { text: 'Error: ' + err.message, background: 'red' });
+        } finally {
+          button.disabled = false;
+        }
+      });
+    }
+
+    refresh();
+  });*/

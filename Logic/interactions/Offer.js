@@ -85,14 +85,14 @@ module.exports = {
             if(!(await Owner.isReal(ownerId)))
             {throw new FieldError('ownerId', 'Owner does not exist')}
 
-            return await this.find({ seller: ownerId });
+            return await this.find({ seller: ownerId, status: 'available' });
         });
       },
       async OfferOfDog(dogId){
         if(!(await Dog.isReal(dogId)))
         {throw new FieldError('dogId', 'Dog does not exist')}
 
-        return await this.findOne({ dog: dogId, status: 'available' });
+        return await this.findOne({ dog: dogId, status: 'available' }).lean();
       },
 
       // used for debug/seeding

@@ -25,25 +25,94 @@
       </a>
     </p>
 
+    <!-- 🐶 Dog Status -->
     <p>
       <strong>Status:</strong>
-      <% if (dog.traded) { %>
-        <span style="color: green;">Available for Trade</span>
-      <% } else { %>
-        <span style="color: gray;">Not Currently Offered</span>
-      <% } %>
+      <span id="DogStatus"></span>
     </p>
 
-    <% if (myDog) { %>
-      <div style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
-        <h2>This is your dog 🐶</h2>
-        <p>In the future, you’ll be able to manage trades, update their info, or remove them.</p>
-      </div>
-    <% } else { %>
-      <div style="margin-top: 2rem; padding: 1rem; background-color: #f9f9f9; border: 1px solid #ddd;">
-        <p>You are viewing <%= dog.name || "this dog's" %> public profile.</p>
-      </div>
-    <% } %>
+    <!-- 🤝 Trade Panel -->
+    <div id="TradePanel" style="margin-top: 2rem; background-color: #f9f9f9; padding: 1rem; border: 1px solid #ddd;">
+      <p></p>
+      <button id="BuyBtn" style="padding: 0.6rem 1.2rem; font-size: 1rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;"></button>
+    </div>
+
+    <!-- 👤 MyDog Panel -->
+    <div id="MyDog" style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
+      <h2>This is one of your dogs!</h2>
+      <p></p>
+      <button id="Sell" style="margin-right: 1rem;"></button>
+      <button id="UnsellBtn"></button>
+      <button id="UnregisterBtn"></button>
+    </div>
+
+    <!-- ⚙️ Scripting logic -->
+    <script>
+      StaticState(({ DynamicEJSelements, session, refresh, request }) => {
+        const [
+          DogStatus,
+          TradePanel, BuyBtn,
+          MyDog, Sell, UnsellBtn
+        ] = DynamicEJSelements(
+          'DogStatus',
+          'TradePanel', 'BuyBtn',
+          'MyDog', 'Sell', 'UnsellBtn', 'UnregisterBtn'
+        );
+
+        let dog = session.dog;
+        let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
+        let hasOffer = Boolean(dog.offer) && dog.offer.status === 'available';
+        let isTraded = !ownedByViewer && hasOffer;
+        
+        async function updateDog(){
+          const[success2, result2]=await request(`GET /dog/${dog._id}`);
+          if(!success2){throw result2}
+          session.dog = result2;
+          refresh();
+        }
+        
+        DogStatus.set({text: hasOffer ? 'Avaliable' : 'Not For Sale'});
+
+        /////////////////////////////////////////
+
+        TradePanel.set({visible: isTraded});
+        BuyBtn.set({text:"BUY BUY", background:'green', color:'white', enabled:true, defaultState:true});
+        BuyBtn.onClick(async()=>{
+          BuyBtn.set({text:"purchasing...", background:'blue', disabled:true});
+          const[success, result]=await request(`POST /buyOffer/${dog.offer._id}`);
+          if(!success){throw result}
+
+          updateDog();
+        });
+
+        /////////////////////////////////////////
+
+        MyDog.set({visible: ownedByViewer});
+        // pressed
+
+        Sell.set({text:"SELL SELL", background:'red', color:'white', enabled:true, defaultState:true});
+        Sell.set({visible:!hasOffer});
+        Sell.onClick(async()=>{
+          Sell.set({text:"selling...", background:'brown', disabled:true});
+          const[success, result]=await request(`POST /makeOffer/${dog._id}`);
+          if(!success){throw result}
+          await updateDog();
+          Sell.set({text:"SELL SELL", background:'red', enabled:true});
+        });
+
+        UnsellBtn.set({text:"UNSELL", background:'green', color:'white', enabled:true, defaultState:true});
+        UnsellBtn.set({visible:hasOffer});
+        UnsellBtn.onClick(async()=>{
+          UnsellBtn.set({text:"recollecting...", background:'black', disabled:true});
+          const[success, result]=await request(`DELETE /deleteOffer/${dog.offer._id}`);
+          if(!success){throw result}
+          await updateDog();
+          UnsellBtn.set({text:"UNSELL", background:'green', enabled:true});
+        });
+
+        /////////////////////////////////////////
+      });
+    </script>
 
   </main>
 

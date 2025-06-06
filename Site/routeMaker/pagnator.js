@@ -4,22 +4,23 @@
 
 
 const {pagnation} = require('@MongooseAPI');
-async function pagnate(table, perPage, queries) {
+async function pagnate(table, perPage, queries, criteria={}) {
     return await pagnation({
         table: table,
         sortStyle: queries.sortStyle || 'newest',
         perPage: perPage,
         pageX: parseInt(queries.page) || 1,
+        criteria,
         jsObjects: true
     });
 }
 const{route} = require('./routes');
-module.exports = function PagerPage(pageRoute, header, table, perPage){
+module.exports = function PagerPage(pageRoute, header, table, perPage, criteria={}){
     const pager = async({
         user, userId,
         queries, page
     }) => {
-        let pageData = await pagnate(table, perPage, queries);
+        let pageData = await pagnate(table, perPage, queries, criteria);
         const profiles = await table.getIconData(pageData.results);
         return page(200, 'data/Pagnator', {
             pagnatorTitle: header,

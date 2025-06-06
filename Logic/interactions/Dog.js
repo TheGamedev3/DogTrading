@@ -82,6 +82,22 @@ module.exports = {
           return await this.exists({ _id: id });
       },
 
+      async pageData(dogId){
+        const{Owner, Offer} = require('@Chemicals');
+
+        const pageDog = await this.findOne({ _id: dogId }).lean();
+        // else page dog unavaliable!!!
+
+        const dogOwner = await Owner.findOne({ _id: pageDog.owner }).lean();
+        // impossible not to have an owner!
+
+        pageDog.owner = dogOwner;
+        pageDog.ownerLink = `/UserProfile/${dogOwner._id}`;
+
+        pageDog.offer = await Offer.OfferOfDog(pageDog._id);
+        return pageDog;
+      },
+
       // used for debug/seeding
       async createDummy(props){
           return await this.create(props);

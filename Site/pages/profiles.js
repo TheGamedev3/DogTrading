@@ -11,22 +11,8 @@ module.exports = function createRoutes({route, Webpage}){
         "/DogProfile/:dogId",
         "display/DogProfile",
         {
-            injectInfo: async({params, userId})=>{
-                const pageDog = await Dog.findOne({ _id: params.dogId }).lean();
-                // else page dog unavaliable!!!
-
-                const dogOwner = await Owner.findOne({ _id: pageDog.owner }).lean();
-                // impossible not to have an owner!
-
-                pageDog.owner = dogOwner;
-                pageDog.ownerLink = `/UserProfile/${dogOwner._id}`;
-
-                pageDog.traded = await Offer.OfferOfDog(pageDog._id);
-
-                return {
-                    myDog:userId.toString() === dogOwner._id.toString(),
-                    dog: pageDog
-                };
+            injectInfo: async({params})=>{
+                return { dog: await Dog.pageData(params.dogId) };
             }
         }
     );

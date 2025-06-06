@@ -28,9 +28,31 @@ function createAllRoutes(...routeCreators){
             // (Optional) route params (e.g., /user/:id)
             params: req.params || {},
 
-            json(status, object){res.status(status).json(object)},
-            page(status, file, args={}){
-                return res.status(status).render(file, args);
+            json(status, object){
+                res.status(status).json(object);
+            },
+            page(status, file, args = {}) {
+                // if test mode, args and file should be directly accessible, and not an actual page returning
+
+                const safeArgs = {};
+
+                // Copy only what you need for the frontend
+                for (const [key, value] of Object.entries(args)) {
+                    if (typeof value === 'object') {
+                    try {
+                        safeArgs[key] = JSON.parse(JSON.stringify(value));
+                    } catch (e) {
+                        safeArgs[key] = null;
+                    }
+                    } else {
+                    safeArgs[key] = value;
+                    }
+                }
+
+                return res.status(status).render(file, {
+                    ...args,
+                    args: safeArgs
+                });
             },
             skip:next
         }
