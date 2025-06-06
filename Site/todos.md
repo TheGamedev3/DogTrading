@@ -25,4 +25,6 @@ edit dog/user profiles, register/create dog
 
 tests
 
-pagnation sorter asker thingy
+✅ pagnation sorter asker thingy
+
+

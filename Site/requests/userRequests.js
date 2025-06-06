@@ -4,6 +4,10 @@
 const {Owner} = require('@Chemicals');
 
 module.exports = function createRoutes({route}){
+    route.either('GET /user/:userId', async({json, params})=>{
+        return json(200, await Owner.pageData(params.userId));
+    });
+
     route.preVerified('POST /signup', async({inputs, req, json})=>{
         // replace this with an err catcher forum thingy
 

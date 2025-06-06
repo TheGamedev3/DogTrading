@@ -1,33 +1,43 @@
-
-
-
 async function pagnation({
-    table, perPage=9, pageX=1,
-    sortStyle='newest',
-    criteria={},
+  table,
+  perPage = 9,
+  pageX = 1,
+  sortStyle = 'newest',
+  criteria = {},
+  aggregateExtras = []
+}) {
+  const skip = (pageX - 1) * perPage;
 
-    jsObjects=true
-}){
+  const sortMap = {
+    newest: { created: -1 },
+    oldest: { created: 1 },
+    name_asc: { 'dog.name': 1 },
+    name_desc: { 'dog.name': -1 }
+  };
+  const sortStage = sortMap[sortStyle] || { created: -1 };
 
-    const skip = (pageX - 1) * perPage;
+  const pipeline = [
+    { $match: criteria },
+    ...aggregateExtras,
+    { $sort: sortStage },
+    { $skip: skip },
+    { $limit: perPage }
+  ];
 
-    let query = table.find(criteria).complexSort(sortStyle).skip(skip).limit(perPage);
+  const [results, total] = await Promise.all([
+    table.aggregate(pipeline),
+    table.countDocuments(criteria)
+  ]);
 
-    // Mongoose lean, converts a mongodb object into a regular JS object
-    // (apply .lean() before awaiting the chain)
-    if (jsObjects) query = query.lean();
-
-    const results = await query;
-    const total = await table.countDocuments();
-
-    return{
-        table, pageX, perPage,
-        sortStyle,
-
-        results,
-        totalPages: Math.ceil(total / perPage),
-        totalResults: total
-    };
+  return {
+    table,
+    pageX,
+    perPage,
+    sortStyle,
+    results,
+    totalPages: Math.ceil(total / perPage),
+    totalResults: total
+  };
 }
 
-module.exports = {pagnation};
+module.exports = { pagnation };

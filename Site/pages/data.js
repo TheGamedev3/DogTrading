@@ -15,7 +15,20 @@ module.exports = function createRoutes({PagerPage}){
     // make it so u can edit the dogs if you own them, or your own profile
     // make a person profile info function
 
-    PagerPage('allOffers', 'All Offers', Offer, 6, {status:'available'});
+    PagerPage('allOffers', 'All Offers', Offer, 6,
+        {status:'available'},
+        [
+            {
+            $lookup: {
+                from: 'dogs',
+                localField: 'dog',
+                foreignField: '_id',
+                as: 'dog'
+            }
+            },
+            { $unwind: '$dog' }
+        ]
+    );
 
     // custom sort props also needed like { status: "avaliable" }
 

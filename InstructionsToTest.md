@@ -9,12 +9,12 @@
 
 
 Leftover todos:
-- all offers
-- my page
-- dog page
+✅ - all offers
+✅ - my page
+✅ - dog page
 - edit self or dog
 - add dog
-- trade/buy dog
+✅ - trade/buy dog
 - learn how to make mocha and chai tests better
 - file structure documentation
 

@@ -10,6 +10,28 @@
   <main style="padding: 2rem;">
 
     <h1><%= pagnatorTitle %></h1>
+
+    <form id="sortForm" style="margin-bottom: 1rem;">
+      <label for="sortSelect">Sort by: </label>
+      <select id="sortSelect" name="sortStyle">
+        <option value="newest" <%= sortStyle === 'newest' ? 'selected' : '' %>>Newest</option>
+        <option value="oldest" <%= sortStyle === 'oldest' ? 'selected' : '' %>>Oldest</option>
+        <option value="name_asc" <%= sortStyle === 'name_asc' ? 'selected' : '' %>>A → Z</option>
+        <option value="name_desc" <%= sortStyle === 'name_desc' ? 'selected' : '' %>>Z → A</option>
+      </select>
+    </form>
+
+    <script>
+      // Automatically redirect when dropdown changes
+      document.getElementById('sortSelect').addEventListener('change', function () {
+        const selectedSort = this.value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('sortStyle', selectedSort);
+        url.searchParams.set('page', 1); // Reset to page 1 when sorting
+        window.location.href = url.toString();
+      });
+    </script>
+
     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
       <% for (const profile of profiles) { %>
         <%- include('../shared/Icon', profile) %>
@@ -18,11 +40,11 @@
 
     <div style="margin-top: 2rem;">
       <% if (pageX > 1) { %>
-        <a href="?page=<%= pageX - 1 %>">⬅ Prev</a>
+        <a href="?page=<%= pageX - 1 %>&sortStyle=<%= sortStyle %>">⬅ Prev</a>
       <% } %>
       <span style="margin: 0 10px;">Page <%= pageX %> of <%= totalPages %></span>
       <% if (pageX < totalPages) { %>
-        <a href="?page=<%= pageX + 1 %>">Next ➡</a>
+        <a href="?page=<%= pageX + 1 %>&sortStyle=<%= sortStyle %>">Next ➡</a>
       <% } %>
     </div>
 
