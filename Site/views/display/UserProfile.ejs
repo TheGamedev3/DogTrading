@@ -9,12 +9,6 @@
 
   <main style="padding: 2rem; max-width: 600px; margin: auto;">
 
-    <% if (justLoggedIn) { %>
-      <div style="padding: 1rem; background-color: #d0f0c0; border: 1px solid #8bc34a; margin-bottom: 1rem;">
-        ✅ Thanks for logging in, <%= user.name || user.email %>!
-      </div>
-    <% } %>
-
     <h1><%= pageUser.name %></h1>
 
     <% if (pageUser.profile) { %>

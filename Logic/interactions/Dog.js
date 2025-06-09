@@ -8,7 +8,7 @@ module.exports = {
     {
       name: {
         type: String,
-        required: false
+        required: true
       },
       owner: {
         type: 'ObjectId',
@@ -56,6 +56,7 @@ module.exports = {
         });
       },
       async modify(dogId, props){
+        return await err_catcher(async()=>{
           const dog = await this.findOne({ _id: dogId });
           if(!dog)throw new FieldError('dogId', 'Dog does not exist');
 
@@ -66,6 +67,7 @@ module.exports = {
 
           Object.assign(dog, props);
           return await dog.save();
+        });
       },
 
       async selfOwnsDog(ownerId, dogId){

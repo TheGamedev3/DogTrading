@@ -5,25 +5,112 @@
 </head>
 <body style="font-family: sans-serif; margin: 0; padding: 0;">
 
-  <%- include('../shared/Header') %>
+    <%- include('../shared/Header') %>
 
-  <main style="padding: 2rem; max-width: 600px; margin: auto;">
+    <main style="padding: 2rem; max-width: 600px; margin: auto;">
 
-    <h1><%= dog.name || "Unnamed Dog" %></h1>
+    <h1 id="dogName"></h1>
+    <input id="editDogName" type="text" value="" style="display: none; font-size: 2rem; width: 100%;" />
 
-    <% if (dog.profile) { %>
-      <div style="margin: 1rem 0;">
-        <img src="<%= dog.profile %>" alt="Dog profile picture" style="max-width: 100%; border-radius: 8px; border: 1px solid #ccc;" />
-      </div>
-    <% } else { %>
-      <p><em>No profile picture available.</em></p>
-    <% } %>
+    <div style="margin: 1rem 0;">
+      <img id="profilePicture" src="" alt="Dog profile picture" style="max-width: 100%; border-radius: 8px; border: 1px solid #ccc;" />
+      <p id="profileUnavailable"><em>No profile picture available.</em></p>
+      <input id="editProfileURL" type="text" value="" style="display: none; width: 100%;" />
+      <button id="editProfileBtn" style="margin-top: 0.5rem;">Edit Profile Picture</button>
+    </div>
 
     <p><strong>Owner:</strong>
-      <a href="<%= dog.ownerLink %>" style="color: #3366cc;">
-        <%= dog.owner?.name || "Unknown Owner" %>
+      <a id="ownerLink" href="" style="color: #3366cc;">
       </a>
     </p>
+
+    <!-- ⚙️ Display Info logic -->
+    <script>
+      StaticState(({ DynamicEJSelements, session, refresh, request, onFirstRun }) => {
+        const [
+          dogName, editDogName,
+          profilePicture, profileUnavailable, editProfileURL,
+          editProfileBtn,
+          ownerLink
+        ] = DynamicEJSelements(
+          "dogName", "editDogName",
+          "profilePicture", "profileUnavailable", "editProfileURL",
+          "editProfileBtn",
+          "ownerLink"
+        );
+
+        let dog = session.dog;
+        let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
+        
+        async function updateDog(){
+          const[success2, result2]=await request(`GET /dog/${dog._id}`);
+          if(!success2){throw result2}
+          session.dog = result2;
+          refresh();
+        }
+
+        onFirstRun(()=>session.editing = false);
+        let editMode = session.editing;
+        
+        /////////////////////////////////////////
+
+        dogName.set({text:dog.name || "unnamed dog", visible:!editMode});
+        editDogName.set({value:dog.name, placeholderText:"Enter a name!", visible:editMode});
+
+        profilePicture.set({src:dog.profile, visible:dog.profile});
+        profileUnavailable.set({text:'[image missing or unavailable]', visible:!dog.profile});
+        editProfileURL.set({value:dog.profile, placeholderText:"Enter an img url!", visible:editMode});
+
+        editProfileBtn.set({text:"edit?", defaultState:true});
+        editProfileBtn.onClick(()=>{
+          editMode = !editMode;
+          session.editing = editMode;
+          editProfileBtn.set(
+            editMode
+            ? {text:"view dog?", color: "green"}
+            : {text:"edit dog?", color: "blue"}
+          );
+          refresh();
+        });
+
+        /////////////////////////////////////////
+        // 📝 onTextSubmit for name
+        editDogName.onTextSubmit(async (value) => {
+          const newName = value.trim();
+          if (newName === dog.name) return;
+          const [success, result] = await request(`PATCH /editDog/${dog._id}`, { name: newName });
+          console.log(result)
+          if(!success){
+            // blank name error
+            if(result && result.server.includes("`name` is required")){
+              editDogName.displayError("name field can't be blank!");
+            }else{
+              // misc error
+              editDogName.displayError("invalid name!");
+            }
+            throw result;
+          }else{
+            editDogName.clearError();
+          }
+          await updateDog();
+        });
+
+        /////////////////////////////////////////
+        // 🖼️ onTextSubmit for profile URL
+        editProfileURL.onTextSubmit(async (value) => {
+          const newURL = value.trim();
+          if (newURL === dog.profile) return;
+
+          profilePicture.set({ visible: true, src: newURL });
+          
+          const [success, result] = await request(`PATCH /editDog/${dog._id}`, { profile: newURL });
+          if (!success) throw result;
+          await updateDog();
+        });
+
+        /////////////////////////////////////////
+      });
+    </script>
 
     <!-- 🐶 Dog Status -->
     <p>
@@ -46,7 +133,7 @@
       <button id="UnregisterBtn"></button>
     </div>
 
-    <!-- ⚙️ Scripting logic -->
+    <!-- ⚙️ Trade logic -->
     <script>
       StaticState(({ DynamicEJSelements, session, refresh, request }) => {
         const [

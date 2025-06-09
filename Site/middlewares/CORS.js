@@ -5,6 +5,6 @@ const { link } = require('../launcher');
 
 module.exports = cors({
   origin: [link], // allowed origins
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE'],
   credentials: true
 });
