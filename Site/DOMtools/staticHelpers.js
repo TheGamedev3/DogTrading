@@ -97,6 +97,19 @@ window.StaticState=function(stateDefinition){
                     }
                 },
 
+                focus(){
+                    const el = document.getElementById(id);
+                    if (el && typeof el.focus === 'function') el.focus();
+                },
+
+                focusAll() {
+                    const el = document.getElementById(id);
+                    if (el && typeof el.focus === 'function') {
+                        el.focus();
+                        if (typeof el.select === 'function') el.select(); // select all text
+                    }
+                },
+
                 get(){ return document.getElementById(id); }
             };
 
