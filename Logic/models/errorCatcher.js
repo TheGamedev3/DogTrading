@@ -1,28 +1,45 @@
 
 
 async function err_catcher(func, ...fieldErrors){
-    try{
-        return await func();
-    }catch(err){
-        const errors = {err:true};
-        if(err.name === "FieldError"){
-            errors[err.field] = err.message;
-        }
-        for(const{code, field, reason} of fieldErrors){
-            if(err.code !== code)continue;
-            if(Object.keys(err.keyValue)[0] !== field)continue;
-            errors[field] = reason;
-        }
-        if (err.message.includes('user validation failed')) {
-            Object.values(err.errors).forEach(({ properties }) => {
-                errors[properties.path] = properties.message;
-            });
-        }
-        if(Object.keys(errors).length===1){
-            errors.server = err.message;
-        }
-        return errors;
+  try{
+    return await func();
+  }catch(err){
+    const errors = { err:true };
+
+    /* ───── rename low-level messages -> friendlier text ───── */
+    for(const { oldName, rename } of fieldErrors){
+      if(oldName && rename && err.message.toLowerCase().includes(oldName.toLowerCase())){
+        err.message = rename;
+      }
     }
+
+    /* ───── mongoose / custom field errors ───── */
+    if(err.name === 'FieldError'){
+      errors[err.field] = err.message;
+    }
+    for(const { code, field, reason } of fieldErrors){
+      if(code && err.code !== code) continue;
+      if(field && err.keyValue && Object.keys(err.keyValue)[0] !== field) continue;
+      errors[field] = reason;
+    }
+    if(err.message.includes('user validation failed')){
+      Object.values(err.errors).forEach(({ properties })=>{
+        errors[properties.path] = properties.message;
+      });
+    }
+
+    /* ───── summary message logic ───── */
+    const detailKeys = Object.keys(errors).filter(k => k !== 'err');
+    if(detailKeys.length === 0){                    // no field details ► plain message
+      errors.message = err.message;
+    }else if(detailKeys.length === 1){              // exactly one detail ► reuse it
+      errors.message = errors[ detailKeys[0] ];
+    }else{                                          // many details ► join with commas
+      errors.message = detailKeys.map(k=>errors[k]).join(', ');
+    }
+
+    return errors;
+  }
 }
 
 class FieldError extends Error {

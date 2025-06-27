@@ -8,19 +8,19 @@ module.exports = function createRoutes({route}){
     route('POST /makeOffer/:dogId', async({userId, json, params})=>{
         // use an error catcher thing here later
         const dogId = params.dogId;
-        if(!Dog.selfOwnsDog(userId, dogId)){return json(500, new Error('you dont own this dog!'))}
+        if(!Dog.selfOwnsDog(userId, dogId)){return await json(500, new Error('you dont own this dog!'))}
         
-        return json(200, await Offer.makeOffer(userId, dogId));
+        return await json(200, async()=>await Offer.makeOffer(userId, dogId));
     });
     route('DELETE /deleteOffer/:offerId', async({userId, json, params})=>{
         // use an error catcher thing here later
 
-        return json(200, await Offer.deleteOffer(userId, params.offerId));
+        return await json(200, async()=>await Offer.deleteOffer(userId, params.offerId));
     });
     route('POST /buyOffer/:offerId', async({userId, json, params})=>{
         // use an error catcher thing here later
 
-        return json(200, await Offer.buyOffer(userId, params.offerId));
+        return await json(200, async()=>await Offer.buyOffer(userId, params.offerId));
     });
 
 };

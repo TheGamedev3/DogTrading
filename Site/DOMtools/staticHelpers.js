@@ -9,8 +9,8 @@
 
 // (this is heavily based on principles of the React framework)
 
-const updateStates = [];
-function refresh(){updateStates.forEach(func=>func())}
+const updateStates = []; let i_id=0;
+function refresh(){i_id=0; updateStates.forEach(func=>func())}
 
 const persistentObject = window.args;
 const allIds = {};
@@ -81,12 +81,17 @@ window.StaticState=function(stateDefinition){
                         textInput.addEventListener('blur', blurHandler);
 
                         definedEvents.push(() => {
-                        if (textInput) {
-                            textInput.removeEventListener('keydown', handler);
-                            textInput.removeEventListener('blur', blurHandler);
-                        }
+                            if (textInput) {
+                                textInput.removeEventListener('keydown', handler);
+                                textInput.removeEventListener('blur', blurHandler);
+                            }
                         });
                     }
+                },
+
+                getValue(){
+                    const textInput = document.getElementById(id);
+                    return textInput.value.trim();
                 },
 
                 onEdit(func) {
@@ -114,6 +119,7 @@ window.StaticState=function(stateDefinition){
             };
 
             ejsInstance.displayError = (msg = "Invalid input") => {
+                if(msg === undefined || msg === null){ejsInstance.clearError(); return}
                 const el = document.getElementById(id); if (!el) return;
 
                 el.style.border = '2px solid red';
@@ -124,6 +130,7 @@ window.StaticState=function(stateDefinition){
                     errMsg.style.color = 'red';
                     errMsg.style.fontSize = '0.85em';
                     errMsg.style.marginTop = '4px';
+                    el.style.display = 'block';
                     el.insertAdjacentElement('afterend', errMsg);
                     ejsInstance.errMsg = errMsg;
                 }
@@ -176,14 +183,9 @@ window.StaticState=function(stateDefinition){
         try {
             const res = await fetch(route, options);
 
-            if (!res.ok) {
-                const error = await res.text();
-                throw new Error(`HTTP ${res.status}: ${error}`);
-            }
-
             // Attempt to parse JSON response
             const data = await res.json().catch(() => ({})); // fallback to empty if no JSON
-            if(data && typeof data === 'object' && data.err === true){return[false, data]}
+            if((data && typeof data === 'object' && data.err === true) || !res.ok){return[false, data]}
             return[true, data];
         } catch (err) {
             console.error('Request failed:', err);
@@ -192,6 +194,22 @@ window.StaticState=function(stateDefinition){
     }
     async function onFirstRun(func){if(firstRun){return await func()}}
 
+    const cachedFunctions={};
+    function useVar(val){
+        const myId = i_id;
+        i_id+=1;
+        onFirstRun(()=>{
+            persistentObject[myId] = val;
+            cachedFunctions[myId]??=(setVal)=>{
+                if(setVal !== undefined){
+                    persistentObject[myId] = setVal;
+                }
+                return persistentObject[myId];
+            };
+        });
+        return cachedFunctions[myId];
+    }
+
     updateStates.push(()=>{
         // Unlisten to all previous event handlers before they get redefined
         definedEvents.forEach(func=>func());
@@ -199,7 +217,8 @@ window.StaticState=function(stateDefinition){
         stateDefinition({
             session:persistentObject, refresh, request,
             DynamicEJSelements,
-            onFirstRun
+            onFirstRun,
+            useVar
         })
     });
     

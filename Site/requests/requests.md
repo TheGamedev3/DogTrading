@@ -1,6 +1,6 @@
 
 
-// requests:
+// requests to add later:
 
 // sign up
 // login
@@ -18,11 +18,3 @@
 // get page data of
 // get page x of table y
 
-
-
-
-// later on add proper views and images
-
-// figure out where to put the err catcher
-// probably during each request, while server actions take place
-// figure out how to handle incoming {err: true} things

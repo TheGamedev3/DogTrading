@@ -3,6 +3,7 @@
 function createAllRoutes(...routeCreators){
 
     const{route, getDefinedRoutes, clearRoutes} = require('./routes');
+    const{err_catcher} = require('@MongooseAPI');
 
     const Webpage = require('./webpage');
     const PagerPage = require('./pagnator');
@@ -28,7 +29,23 @@ function createAllRoutes(...routeCreators){
             // (Optional) route params (e.g., /user/:id)
             params: req.params || {},
 
-            json(status, object){
+            async json(status, object){
+                let success = true;
+                if(typeof object === 'function'){
+                    const result = await err_catcher(
+                        object,
+                        {oldName:"failed: name: username", rename:"username can't be blank!"}
+                    );
+                    success = !(result && typeof result === 'object' && result.err===true);
+                    object = result;
+                }
+                if(!success){
+                    if(typeof result === 'object' && result.code !== undefined){
+                        status = result.code;
+                    }else{
+                        status = 500;
+                    }
+                }
                 res.status(status).json(object);
             },
             page(status, file, args = {}) {

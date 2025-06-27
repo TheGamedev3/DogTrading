@@ -6,21 +6,44 @@
 <!-- Load helper script -->
 <script src="/staticHelpers.js"></script>
 
+  <!-- 💄 unified button styling -->
+  <style>
+    .action-btn{
+      padding: .6rem 1.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      transition: opacity .15s ease;
+    }
+    .action-btn:disabled{opacity:.55;cursor:not-allowed}
+
+    /* colour variants */
+    .buy       {background:#28a745}
+    .sell      {background:#fd7e14}
+    .unsell    {background:#17a2b8}
+    .unregister{background:#dc3545}
+  </style>
+
 <header style="padding: 1rem; background: #f5f5f5; border-bottom: 1px solid #ccc;">
-  <nav style="display: flex; gap: 1rem;">
-    <a href="/home">Home</a>
-    <a href="/allUsers">All Users</a>
-    <a href="/allDogs">All Dogs</a>
-    <a href="/allOffers">All Offers</a>
-    <% if (!user) { %>
-      <a href="/signup">Sign Up</a>
-      <a href="/login">Log In</a>
-    <% } else { %>
-      <a href="/UserProfile/<%= userId %>">My Profile</a>
-      <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">Log Out</a>
-      <form id="logout-form" action="/logout" method="POST" style="display: none;"></form>
-    <% } %>
-  </nav>
+  <div style="display: flex; justify-content: center;">
+    <nav style="display: flex; gap: 1rem;">
+      <a href="/home">Home</a>
+      <a href="/allUsers">All Users</a>
+      <a href="/allDogs">All Dogs</a>
+      <a href="/allOffers">All Offers</a>
+      <% if (!user) { %>
+        <a href="/signup">Sign Up</a>
+        <a href="/login">Log In</a>
+      <% } else { %>
+        <a href="/UserProfile/<%= userId %>">My Profile</a>
+        <a href="#" onclick="document.getElementById('logout-form').submit(); return false;">Log Out</a>
+        <form id="logout-form" action="/logout" method="POST" style="display: none;"></form>
+      <% } %>
+    </nav>
+  </div>
 </header>
 
 <% if (justLoggedIn) { %>

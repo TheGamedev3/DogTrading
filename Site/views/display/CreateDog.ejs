@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register Dog</title>
+</head>
+<body style="font-family:sans-serif;margin:0;padding:0;">
+
+  <%- include('../shared/Header') %>
+
+  <main style="padding:2rem;max-width:600px;margin:auto;">
+
+    <h1 style="margin-top:0;">Register a New Dog 🐶</h1>
+
+    <!-- Name field -->
+    <div style="margin:1rem 0;">
+      <label for="dogNameInput"><strong>Name:</strong></label>
+      <input id="dogNameInput" type="text" placeholder="e.g. Fido"
+             style="width:100%;margin-top:0.25rem;">
+    </div>
+
+    <!-- Profile-URL field -->
+    <div style="margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
+      <!-- Image + Button Row -->
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <!-- Profile Image -->
+        <div>
+          <img id="profilePicture" src="" alt="Dog profile picture"
+              style="width: 300px; height: auto; border-radius: 8px; border: 1px solid #ccc;" />
+          <p id="profileUnavailable"><em>No profile picture available.</em></p>
+        </div>
+      </div>
+
+      <!-- URL Input below -->
+      <div style="margin:1rem 0;">
+            <label for="profileURLInput"><strong>Profile URL:</strong></label>
+            <input id="profileURLInput" type="text" placeholder="https://…"
+                  style="width:100%;margin-top:0.25rem;">
+          </div>
+    </div>
+
+    <!-- Error banner (hidden by default) -->
+    <p id="errorBanner" style="color:#c00;display:none;"></p>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+        <button id="registerBtn" type="button"
+                style="flex:1;background:#28a745;color:#fff;border:none;
+                    padding:0.75rem;border-radius:4px;cursor:pointer;">
+        Register
+        </button>
+        <button id="backBtn" type="button"
+                style="flex:1;background:#6c757d;color:#fff;border:none;
+                    padding:0.75rem;border-radius:4px;cursor:pointer;">
+        Back
+        </button>
+    </div>
+
+    <!-- ⚙️ Page logic -->
+    <script>
+
+      StaticState(({ DynamicEJSelements, session, request, refresh }) => {
+        const [
+          dogNameInput,
+          profilePicture, profileUnavailable, profileURLInput,
+          errorBanner,
+          registerBtn, backBtn
+        ] = DynamicEJSelements(
+          'dogNameInput',
+          'profilePicture', 'profileUnavailable', 'profileURLInput',
+          'errorBanner',
+          'registerBtn', 'backBtn'
+        );
+
+        // helper: show / hide error
+        function showError(msg)   { errorBanner.set({ text: msg, visible: true }); }
+        function clearError()     { errorBanner.set({ visible: false, text: '' }); }
+
+        function imageChange(){
+          const url = profileURLInput.getValue();
+          profilePicture.set({src:url, visible:url});
+          profileUnavailable.set({text:'[image missing or unavailable]', visible:!url});
+        }
+        imageChange();
+        profileURLInput.onTextSubmit((val)=>imageChange());
+
+        // --- Register click ---
+        registerBtn.onClick(async(e) => {
+          e.preventDefault();
+          clearError();
+          const name    = dogNameInput.getValue();
+          const profile = profileURLInput.getValue();
+
+          // simple client-side validation
+          dogNameInput.errorIf('Name is required', !name);
+          profileURLInput.errorIf('Profile URL required', !profile);
+          if(!name || !profile)return;
+
+          registerBtn.set({ text:'Registering…', disabled:true });
+
+          const [success, result] =
+            await request('POST /registerDog', { name, profile });
+
+          if (!success) {
+            // result may come back as {server: "..."} or field-level errors
+            dogNameInput.displayError(result.name);
+            profileURLInput.displayError(result.profile);
+            if (result.server) showError(result.server);
+            registerBtn.set({ text:'Register', disabled:false });
+            return;
+          }
+
+          // redirect to the new dog’s profile
+          window.location.href = `/DogProfile/${result._id}`;
+        });
+
+        // --- Back click ---
+        backBtn.onClick(() => history.back());
+      });
+    </script>
+
+  </main>
+</body>
+</html>

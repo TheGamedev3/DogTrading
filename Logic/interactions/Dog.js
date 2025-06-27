@@ -8,7 +8,7 @@ module.exports = {
     {
       name: {
         type: String,
-        required: true
+        required: [true, "dog name can't be blank!"],
       },
       owner: {
         type: 'ObjectId',
@@ -38,14 +38,12 @@ module.exports = {
         });
       },
       async registerDog(name, ownerId, image=''){
-        return await err_catcher(async()=>{
-            if(ownerId !== undefined && !(await Owner.isReal(ownerId)))
-            {throw new FieldError('ownerId', 'Owner does not exist')}
+        if(ownerId !== undefined && !(await Owner.isReal(ownerId)))
+        {throw new FieldError('ownerId', 'Owner does not exist')}
 
-            const object = { name, owner: ownerId };
-            if(image){object.profile = image}
-            return await this.create(object);
-        });
+        const object = { name, owner: ownerId };
+        if(image){object.profile = image}
+        return await this.create(object);
       },
       async DogsOf(ownerId, sortStyle){
         return await err_catcher(async()=>{
@@ -107,8 +105,15 @@ module.exports = {
       },
 
       async delete(dogId){
+
+        // Cascade delete all offers (any status) associated with the dog
+        const { Offer } = require('./Offer');
+        await Offer.deleteMany({ dog: dogId });
+
+        // Then delete the dog itself
         const deleted = await this.findByIdAndDelete(dogId);
         if (!deleted) throw new FieldError('dogId', 'Dog does not exist or was already deleted');
+
         return deleted;
       },
 

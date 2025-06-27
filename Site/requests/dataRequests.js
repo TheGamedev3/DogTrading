@@ -14,12 +14,12 @@ module.exports = function createRoutes({route}){
         });
     }
     route('GET /allUsersInfo', async({queries, json})=>{
-        return json(200, await pagnate(Owner, 3, queries))
+        return await json(200, async()=>await pagnate(Owner, 3, queries))
     });
     route('GET /allDogsInfo', async({queries, json})=>{
-        return json(200, await pagnate(Dog, 6, queries))
+        return await json(200, async()=>await pagnate(Dog, 6, queries))
     });
     route('GET /allOffersInfo', async({queries, json})=>{
-        return json(200, await pagnate(Offer, 6, queries))
+        return await json(200, async()=>await pagnate(Offer, 6, queries))
     });
 };

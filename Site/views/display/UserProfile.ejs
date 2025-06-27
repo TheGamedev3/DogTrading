@@ -9,23 +9,75 @@
 
   <main style="padding: 2rem; max-width: 600px; margin: auto;">
 
-    <h1><%= pageUser.name %></h1>
+    <!-- Username Edit Section -->
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <h1 id="userName" style="margin: 0;"></h1>
 
-    <% if (pageUser.profile) { %>
-      <div style="margin: 1rem 0;">
-        <img src="<%= pageUser.profile %>" alt="User profile picture" style="width: 200px; border-radius: 8px; border: 1px solid #ccc;" />
+      <div style="display: flex; flex-direction: column;">
+        <input id="editUserName" type="text" value="" style="display: none; font-size: 2rem;" />
       </div>
-    <% } else { %>
-      <p><em>No profile picture available.</em></p>
-    <% } %>
 
-    <p><strong>Email:</strong> <%= pageUser.email %></p>
+      <button id="editNameBtn">Edit Username</button>
+    </div>
+
+    <!-- Profile Picture Section -->
+    <div style="margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
+      <!-- Image + Button Row -->
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div>
+          <img id="profilePicture" src="" alt="User profile picture"
+               style="width: 200px; border-radius: 8px; border: 1px solid #ccc;" />
+          <p id="profileUnavailable"><em>No profile picture available.</em></p>
+        </div>
+
+        <!-- Edit Button aligned to top of image -->
+        <div style="padding-top: 0.25rem;">
+          <button id="editProfileBtn">Edit Profile Picture</button>
+        </div>
+      </div>
+
+      <!-- URL Input below -->
+      <div>
+        <input id="editProfileURL" type="text" value="" style="display: none; width: 100%;" />
+      </div>
+    </div>
+
+    <!-- Email Section -->
+    <div style="margin: 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+      <p id="emailRow" style="margin: 0;"><strong>Email:</strong> <span id="userEmail"></span></p>
+      <button id="editEmailBtn">Edit Email</button>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+      <input id="editUserEmail" type="email" value="" style="width:100%;" />
+      <input id="editUserPassword" type="password" placeholder="Type password to confirm" style="width:100%;" />
+    </div>
+    <!-- make parent always in flow so buttons actually reveal -->
+    <div id="emailActionBtns" style="gap:0.5rem;">
+      <button id="submitEmailBtn" >Submit</button>
+      <button id="cancelEmailBtn" type="button" >Cancel</button>
+    </div>
+
+    <div id="passwordChanger">
+      <!-- Password Change Section -->
+      <div style="margin: 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+        <p style="margin: 0;"><strong>Password:</strong> ••••••••</p>
+        <button id="changePasswordBtn">Change Password</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:0.5rem;">
+        <input id="oldPasswordInput" type="password" placeholder="Current password" style="display:none; width:100%;" />
+        <input id="newPasswordInput" type="password" placeholder="New password" style="display:none; width:100%;" />
+      </div>
+      <!-- same fix for password buttons -->
+      <div id="passwordActionBtns" style="gap:0.5rem;">
+        <button id="submitPasswordBtn" style="display:none;">Submit</button>
+        <button id="cancelPasswordBtn" type="button" style="display:none;">Cancel</button>
+      </div>
+    </div>
 
     <% if (myProfile) { %>
       <div style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
         <h2>This is your profile 👤</h2>
         <p>You can edit your info or manage your dogs and trades here in the future.</p>
-        <!-- <a href="/editProfile">Edit Profile</a> (for future) -->
       </div>
     <% } else { %>
       <div style="margin-top: 2rem; padding: 1rem; background-color: #f9f9f9; border: 1px solid #ddd;">
@@ -42,14 +94,295 @@
       </div>
     <% } %>
 
-    <% if (pageUser.myDogs.length > 0) { %>
+    <% if (pageUser.myDogs.length > 0 || myProfile) { %>
       <h1><%= pageUser.name %>'s dogs:</h1>
       <div style="display: flex; flex-wrap: wrap; gap: 20px;">
         <% for (const profile of pageUser.myDogs) { %>
           <%- include('../shared/Icon', profile) %>
         <% } %>
+
+        <% if (myProfile) { %>
+          <a href="/createDog" style="text-decoration: none; color: inherit;">
+            <div style="position: relative; width: 100px; height: 120px; text-align: center; cursor: pointer;">
+              <div style="width: 100px; height: 100px; border-radius: 8px; border: 2px dashed #ccc; display: flex; align-items: center; justify-content: center;">
+                <div style="font-size: 32px; color: #aaa;">+</div>
+              </div>
+              <div style="margin-top: 4px; font-size: 14px; color: #555;">Add Dog</div>
+            </div>
+          </a>
+        <% } %>
       </div>
     <% } %>
+
+    <!-- ⚙️ Dynamic User Logic -->
+    <script>
+      StaticState(({ DynamicEJSelements, session, refresh, request, useVar, onFirstRun }) => {
+        const [
+          userName, editUserName, editNameBtn,
+          profilePicture, profileUnavailable, editProfileURL,
+          editProfileBtn,
+          userEmail, editEmailBtn, editUserEmail, editUserPassword,
+          submitEmailBtn, cancelEmailBtn,
+          passwordChanger, changePasswordBtn, oldPasswordInput, newPasswordInput,
+          submitPasswordBtn, cancelPasswordBtn,
+          DeleteAccountBtn
+        ] = DynamicEJSelements(
+          'userName', 'editUserName', 'editNameBtn',
+          'profilePicture', 'profileUnavailable', 'editProfileURL',
+          'editProfileBtn',
+          'userEmail', 'editEmailBtn', 'editUserEmail', 'editUserPassword',
+          'submitEmailBtn', 'cancelEmailBtn',
+          'passwordChanger', 'changePasswordBtn', 'oldPasswordInput', 'newPasswordInput',
+          'submitPasswordBtn', 'cancelPasswordBtn',
+          'DeleteAccountBtn'
+        );
+
+        // Retrieve the user being viewed
+        let user = session.pageUser || session.userProfile || session.user;
+        let ownedByViewer = session.userId && (user._id.toString() === session.userId.toString());
+
+        /////////////////////////////////////////
+        // Helpers
+        async function updateUser () {
+          const [success, result] = await request(`GET /user/${user._id}`);
+          if (!success) { throw result; }
+          session.pageUser = result;
+          user = result;
+          refresh();
+        }
+
+        function hideEmailEditFields () {
+          editUserEmail.set({ visible: false, value: '', disabled: false });
+          editUserPassword.set({ visible: false, value: '', disabled: false });
+          submitEmailBtn.set({ visible: false, disabled: false });
+          cancelEmailBtn.set({ visible: false });
+        }
+
+        function hidePasswordEditFields () {
+          oldPasswordInput.set({ visible: false, value: '', disabled: false });
+          newPasswordInput.set({ visible: false, value: '', disabled: false });
+          submitPasswordBtn.set({ visible: false, disabled: false });
+          cancelPasswordBtn.set({ visible: false });
+        }
+
+        onFirstRun(()=>{hideEmailEditFields(); hidePasswordEditFields()})
+
+        /////////////////////////////////////////
+        // ✏️ Username Editing (unchanged)
+        const editName = useVar(false);
+        editNameBtn.set({ text: '✏️', visible: !editName() && ownedByViewer });
+        editNameBtn.onClick(() => {
+          editName(true);
+          editUserName.set({ value: user.name, placeholderText: 'Enter a new username', visible: editName() });
+          if (editName()) { editUserName.focusAll(); }
+          refresh();
+        });
+
+        userName.set({ text: user.name, visible: !editName() });
+
+        editUserName.onTextSubmit(async (value) => {
+          editUserName.set({ disabled: true });
+          const newName = value.trim();
+
+          let success = true;
+          let result = null;
+          if (newName !== user.name) {
+            [success, result] = await request(`PATCH /editMyProfile`, { name: newName });
+          }
+
+          if (!success) {
+            if (result && result.server) {
+              editUserName.displayError(result.server);
+            } else {
+              editUserName.displayError('invalid username!');
+            }
+            editUserName.set({ disabled: false });
+            throw result;
+          } else {
+            editUserName.clearError();
+          }
+
+          editName(false);
+          await updateUser();
+          editUserName.set({ visible: false, disabled: false });
+        });
+
+        editUserName.set({ value: user.name, placeholderText: 'Enter a new username', visible: editName() });
+
+        /////////////////////////////////////////
+        // 🖼️ Profile Picture Editing (unchanged)
+        const editPfp = useVar(false);
+        editProfileBtn.set({ text: '✏️', visible: !editPfp() && ownedByViewer });
+        editProfileBtn.onClick(() => {
+          editPfp(true);
+          editProfileURL.set({ value: user.profile, placeholderText: 'Enter an image url!', visible: editPfp() });
+          if (editPfp()) { editProfileURL.focusAll(); }
+          refresh();
+        });
+
+        profilePicture.set({ src: user.profile, visible: user.profile });
+        profileUnavailable.set({ text: '[image missing or unavailable]', visible: !user.profile });
+
+        editProfileURL.onTextSubmit(async (value) => {
+          const newURL = value.trim();
+          profilePicture.set({ src: newURL, visible: newURL });
+          profileUnavailable.set({ text: '[image missing or unavailable]', visible: !newURL });
+          editProfileURL.set({ disabled: true });
+
+          const [success, result] = await request(`PATCH /editMyProfile`, { profile: newURL });
+          if (!success) {
+            editProfileURL.set({ disabled: false });
+            throw result;
+          }
+          editPfp(false);
+          await updateUser();
+          editProfileURL.set({ visible: false, disabled: false });
+        });
+
+        /////////////////////////////////////////
+        // 📧 Email Editing (with Submit / Cancel)
+        const editEmail = useVar(false);
+        editEmailBtn.set({ text: '✏️', visible: !editEmail() && ownedByViewer });
+        editEmailBtn.onClick(() => {
+          editEmail(true);
+          userEmail.set({ visible: false });
+          editUserEmail.set({ value: user.email, placeholderText: 'Enter a new email', visible: true });
+          editUserPassword.set({ value: '', placeholderText: 'Type password to confirm', visible: true });
+          submitEmailBtn.set({ visible: true, text: 'Submit' });
+          cancelEmailBtn.set({ visible: true, text: 'Cancel' });
+          editUserEmail.focusAll();
+          refresh();
+        });
+
+        // Cancel email editing
+        cancelEmailBtn.onClick(() => {
+          editEmail(false);
+          userEmail.set({ visible: true, text: user.email });
+          hideEmailEditFields();
+          refresh();
+        });
+
+        // Submit new email
+        submitEmailBtn.onClick(async () => {
+          const newEmail = editUserEmail.getValue();
+          const password = editUserPassword.getValue();
+
+          editUserEmail.errorIf('Email required', !newEmail);
+          editUserPassword.errorIf('Password required', !password);
+          if (!newEmail || !password) return;
+
+          const unchangedEmail = newEmail === user.email;
+          editUserEmail.errorIf('Email must be different!', unchangedEmail);
+          if(unchangedEmail)return;
+
+          editUserEmail.set({ disabled: true });
+          editUserPassword.set({ disabled: true });
+          submitEmailBtn.set({ disabled: true });
+
+          const [success, result] = await request(`PATCH /editMyProfile`, { email: newEmail, oldPassword: password });
+          if (!success) {
+            editUserEmail.displayError(result.email);
+            editUserPassword.displayError(result.oldPassword);
+            editUserPassword.displayError(result.server);
+            editUserEmail.set({ disabled: false });
+            editUserPassword.set({ disabled: false });
+            submitEmailBtn.set({ disabled: false });
+            throw result;
+          }
+
+          // Success
+          editUserEmail.clearError();
+          editUserPassword.clearError();
+          await updateUser();
+          editEmail(false);
+          userEmail.set({ text: user.email, visible: true });
+          hideEmailEditFields();
+          refresh();
+        });
+
+        userEmail.set({ text: user.email, visible: !editEmail() });
+
+        /////////////////////////////////////////
+        // 🔒 Password Change (Submit / Cancel)
+        passwordChanger.set({visible:ownedByViewer});
+        const editPwd = useVar(false);
+        changePasswordBtn.set({ visible: !editPwd() && ownedByViewer });
+        changePasswordBtn.onClick(() => {
+          editPwd(true);
+          oldPasswordInput.set({ value: '', placeholderText: 'Current password', visible: true });
+          newPasswordInput.set({ value: '', placeholderText: 'New password', visible: true });
+          submitPasswordBtn.set({ visible: true, text: 'Submit' });
+          cancelPasswordBtn.set({ visible: true, text: 'Cancel' });
+          oldPasswordInput.focusAll();
+          refresh();
+        });
+
+        // Cancel password change
+        cancelPasswordBtn.onClick(() => {
+          editPwd(false);
+          hidePasswordEditFields();
+          refresh();
+        });
+
+        // Submit new password
+        submitPasswordBtn.onClick(async () => {
+          const oldPwd = oldPasswordInput.getValue();
+          const newPwd = newPasswordInput.getValue();
+
+          oldPasswordInput.errorIf('Current password required', !oldPwd);
+          newPasswordInput.errorIf('New password required', !newPwd);
+          if (!oldPwd || !newPwd) return;
+
+          oldPasswordInput.set({ disabled: true });
+          newPasswordInput.set({ disabled: true });
+          submitPasswordBtn.set({ disabled: true });
+
+          const [success, result] = await request(`PATCH /editMyProfile`, { password: newPwd, oldPassword: oldPwd });
+          if (!success) {
+            newPasswordInput.displayError(result.password);
+            oldPasswordInput.displayError(result.oldPassword);
+            newPasswordInput.displayError(result.server);
+            oldPasswordInput.set({ disabled: false });
+            newPasswordInput.set({ disabled: false });
+            submitPasswordBtn.set({ disabled: false });
+            throw result;
+          }
+
+          oldPasswordInput.clearError();
+          newPasswordInput.clearError();
+          editPwd(false);
+          hidePasswordEditFields();
+          refresh();
+        });
+
+
+      DeleteAccountBtn.set({ visible: ownedByViewer, text: 'Delete Account', disabled:false });
+
+      DeleteAccountBtn.onClick(async () => {
+        if (!confirm('This will permanently delete your account, all dogs and offers.\nThis CANNOT be undone.  Continue?')) return;
+
+        DeleteAccountBtn.set({ text: 'Deleting…', disabled: true });
+
+        const [success, result] = await request('DELETE /deleteAccount');
+        if (!success) {
+          alert(result?.message || result?.server || 'Unknown error – account not deleted.');
+          DeleteAccountBtn.set({ text: 'Delete Account', disabled: false });
+          return;
+        }
+
+        /* session is cleared server-side; just bounce home */
+        window.location.href = '/home';
+      });
+
+      });
+    </script>
+
+    <!-- 🗑️  Delete-Account control (shown only on *my* profile) -->
+    <div id="DeleteAccountWrap" style="margin-top:3rem;text-align:center;">
+      <button id="DeleteAccountBtn"
+              class="action-btn unregister">Delete Account</button>
+    </div>
+
 
   </main>
 

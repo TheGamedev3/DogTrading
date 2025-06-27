@@ -7,13 +7,12 @@
 
   <%- include('../shared/Header') %>
 
-  <main style="padding: 2rem;">
+<main style="padding: 2rem; display: flex; justify-content: center;">
+  <div style="text-align: center;">
     <h1>🐶 Welcome to Dog Trading!</h1>
-    <p>
-      Trade dogs between each other!
-    </p>
+    <p>Trade dogs between each other!</p>
 
-    <ul>
+    <ul style="list-style: none; padding: 0;">
       <li>Create your own account</li>
       <li>And Trade Doggies!</li>
     </ul>
@@ -23,7 +22,9 @@
     <% } else { %>
       <p>Welcome back, <%= user.email %>! Go to your <a href="/UserProfile/<%= userId %>">profile</a>.</p>
     <% } %>
-  </main>
+  </div>
+</main>
+
 
 </body>
 </html>

@@ -3,25 +3,45 @@
 <head>
   <title><%= dog.name || "Unnamed Dog" %> | Dog Profile</title>
 </head>
-<body style="font-family: sans-serif; margin: 0; padding: 0;">
+<body style="font-family:sans-serif;margin:0;padding:0;">
 
-    <%- include('../shared/Header') %>
+  <%- include('../shared/Header') %>
 
-    <main style="padding: 2rem; max-width: 600px; margin: auto;">
+  <main style="padding:2rem;max-width:600px;margin:auto;">
 
+
+    <!-- Dog Name Edit Section -->
     <div style="display: flex; align-items: center; gap: 0.5rem;">
       <h1 id="dogName" style="margin: 0;"></h1>
-      <input id="editDogName" type="text" value="" style="display: none; font-size: 2rem;" />
+      
+      <div style="display: flex; flex-direction: column;">
+        <input id="editDogName" type="text" value="" style="display: none; font-size: 2rem;" />
+      </div>
+
       <button id="editNameBtn">Edit Dog's Name</button>
     </div>
 
-    <div style="margin: 1rem 0;">
-      <img id="profilePicture" src="" alt="Dog profile picture" style="max-width: 100%; border-radius: 8px; border: 1px solid #ccc;" />
-      <p id="profileUnavailable"><em>No profile picture available.</em></p>
-      <input id="editProfileURL" type="text" value="" style="display: none; width: 100%;" />
+    <!-- Profile Picture Section -->
+    <div style="margin: 1rem 0; display: flex; flex-direction: column; gap: 0.75rem;">
+      <!-- Image + Button Row -->
+      <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <!-- Profile Image -->
+        <div>
+          <img id="profilePicture" src="" alt="Dog profile picture"
+              style="width: 300px; height: auto; border-radius: 8px; border: 1px solid #ccc;" />
+          <p id="profileUnavailable"><em>No profile picture available.</em></p>
+        </div>
 
-      <div style="margin-top: 0.5rem;">
-        <button id="editProfileBtn">Edit Profile Picture</button>
+        <!-- Edit Button aligned to top of image -->
+        <div style="padding-top: 0.25rem;">
+          <button id="editProfileBtn">Edit Profile Picture</button>
+        </div>
+      </div>
+
+      <!-- URL Input below -->
+      <div>
+        <input id="editProfileURL" type="text" value=""
+              style="display: none; width: 100%;" />
       </div>
     </div>
 
@@ -32,7 +52,7 @@
 
     <!-- ⚙️ Display Info logic -->
     <script>
-      StaticState(({ DynamicEJSelements, session, refresh, request, onFirstRun }) => {
+      StaticState(({ DynamicEJSelements, session, refresh, request, useVar }) => {
         const [
           dogName, editDogName, editNameBtn,
           profilePicture, profileUnavailable, editProfileURL,
@@ -48,6 +68,8 @@
         let dog = session.dog;
         let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
         
+        ownerLink.set({text:dog.owner.name, href:`/UserProfile/${dog.owner._id}`});
+
         async function updateDog(){
           const[success2, result2]=await request(`GET /dog/${dog._id}`);
           if(!success2){throw result2}
@@ -57,26 +79,31 @@
 
         /////////////////////////////////////////
 
-        onFirstRun(()=>session.editName = false);
-        let editName = session.editName;
-        editNameBtn.set({text:"✏️", visible:!editName});
+        // (custom persisting var hook, whose value persists during refreshing)
+        const editName = useVar(false);
+        editNameBtn.set({text:"✏️", visible:!editName() && ownedByViewer});
         editNameBtn.onClick(()=>{
-          editName = true;
-          session.editName = editName;
-          editDogName.set({value:dog.name, placeholderText:"Enter a name for the dog!", visible:editName});
-          if(editName){editDogName.focusAll()}
+          editName(true);
+          editDogName.set({value:dog.name, placeholderText:"Enter a name for the dog!", visible:editName()});
+          if(editName()){editDogName.focusAll()}
           refresh();
         });
 
-        dogName.set({text:dog.name, visible:!editName});
+        dogName.set({text:dog.name, visible:!editName()});
 
         // 📝 onTextSubmit for name
         editDogName.onTextSubmit(async (value) => {
-          const newName = value.trim();
-          if (newName === dog.name) return;
-
           editDogName.set({disabled:true});
-          const [success, result] = await request(`PATCH /editDog/${dog._id}`, { name: newName });
+          const newName = value.trim();
+
+          let success = false; let result = null;
+
+          if (newName === dog.name){success = true}
+          else{
+            const [s2, r2] = await request(`PATCH /editDog/${dog._id}`, { name: newName });
+            success = s2; result = r2;
+          }
+
           if(!success){
             // blank name error
             if(result && result.server.includes("`name` is required")){
@@ -91,23 +118,21 @@
           }else{
             editDogName.clearError();
           }
-          session.editName = false;
+          editName(false);
           await updateDog();
           editDogName.set({visible:false, disabled:false});
         });
 
-        editDogName.set({value:dog.name, placeholderText:"Enter a name!", visible:editName});
+        editDogName.set({value:dog.name, placeholderText:"Enter a name!", visible:editName()});
 
         /////////////////////////////////////////
 
-        onFirstRun(()=>session.editPfp = false);
-        let editPfp = session.editPfp;
-        editProfileBtn.set({text:"✏️", visible:!editPfp});
+        const editPfp = useVar(false);
+        editProfileBtn.set({text:"✏️", visible:!editPfp() && ownedByViewer});
         editProfileBtn.onClick(()=>{
-          editPfp = true;
-          session.editPfp = editPfp;
-          editProfileURL.set({value:dog.profile, placeholderText:"Enter an img url!", visible:editPfp});
-          if(editPfp){editProfileURL.focusAll()}
+          editPfp(true);
+          editProfileURL.set({value:dog.profile, placeholderText:"Enter an img url!", visible:editPfp()});
+          if(editPfp()){editProfileURL.focusAll()}
           refresh();
         });
 
@@ -124,7 +149,7 @@
           
           const [success, result] = await request(`PATCH /editDog/${dog._id}`, { profile: newURL });
           if (!success) {editProfileURL.set({disabled:false}); throw result;}
-          session.editPfp = false;
+          editPfp(false);
           await updateDog();
           editProfileURL.set({visible:false, disabled:false});
         });
@@ -132,26 +157,35 @@
         /////////////////////////////////////////
       });
     </script>
-
+    
     <!-- 🐶 Dog Status -->
     <p>
       <strong>Status:</strong>
       <span id="DogStatus"></span>
     </p>
 
+    <!-- 🚨 pretty error banner (initially hidden) -->
+    <div id="ErrorFlag"
+         style="display:none;margin-top:1rem;padding:.75rem;
+                border:1px solid #dc3545;border-radius:4px;
+                background:#f8d7da;color:#721c24;
+                font-weight:600;"></div>
+
     <!-- 🤝 Trade Panel -->
-    <div id="TradePanel" style="margin-top: 2rem; background-color: #f9f9f9; padding: 1rem; border: 1px solid #ddd;">
+    <div id="TradePanel"
+         style="margin-top:2rem;background:#f9f9f9;padding:1rem;border:1px solid #ddd;">
       <p></p>
-      <button id="BuyBtn" style="padding: 0.6rem 1.2rem; font-size: 1rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;"></button>
+      <button id="BuyBtn" class="action-btn buy"></button>
     </div>
 
     <!-- 👤 MyDog Panel -->
-    <div id="MyDog" style="margin-top: 2rem; background-color: #eef; padding: 1rem; border: 1px solid #ccc;">
+    <div id="MyDog"
+         style="margin-top:2rem;background:#eef;padding:1rem;border:1px solid #ccc;">
       <h2>This is one of your dogs!</h2>
       <p></p>
-      <button id="Sell" style="margin-right: 1rem;"></button>
-      <button id="UnsellBtn"></button>
-      <button id="UnregisterBtn"></button>
+      <button id="Sell"         class="action-btn sell"      ></button>
+      <button id="UnsellBtn"    class="action-btn unsell"    ></button>
+      <button id="UnregisterBtn"class="action-btn unregister"></button>
     </div>
 
     <!-- ⚙️ Trade logic -->
@@ -159,69 +193,89 @@
       StaticState(({ DynamicEJSelements, session, refresh, request }) => {
         const [
           DogStatus,
+          ErrorFlag,
           TradePanel, BuyBtn,
-          MyDog, Sell, UnsellBtn
+          MyDog, Sell, UnsellBtn, UnregisterBtn
         ] = DynamicEJSelements(
           'DogStatus',
-          'TradePanel', 'BuyBtn',
-          'MyDog', 'Sell', 'UnsellBtn', 'UnregisterBtn'
+          'ErrorFlag',
+          'TradePanel','BuyBtn',
+          'MyDog','Sell','UnsellBtn','UnregisterBtn'
         );
 
         let dog = session.dog;
-        let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
-        let hasOffer = Boolean(dog.offer) && dog.offer.status === 'available';
-        let isTraded = !ownedByViewer && hasOffer;
-        
+        let ownedByViewer = session.userId &&
+                            (dog.owner._id.toString() === session.userId.toString());
+        let hasOffer   = Boolean(dog.offer) && dog.offer.status === 'available';
+        let isTraded   = !ownedByViewer && hasOffer;
+
+        /* helper to (a) run an async handler and (b) surface errors nicely */
+        async function run(action){
+          ErrorFlag.set({visible:false});
+          try{ await action(); }
+          catch(e){
+            const msg = (e?.message) ? e.message
+                                     : (e?.server || 'Unknown error');
+            ErrorFlag.set({text:msg, visible:true});
+            console.error(e);
+          }
+        }
+
+        /* refresh dog from server then redraw */
         async function updateDog(){
-          const[success2, result2]=await request(`GET /dog/${dog._id}`);
-          if(!success2){throw result2}
-          session.dog = result2;
+          const [ok,res] = await request(`GET /dog/${dog._id}`);
+          if(!ok) throw res;
+          session.dog = res;
           refresh();
         }
-        
+
+        /* ——— status label ——— */
         DogStatus.set({text: hasOffer ? 'Available' : 'Not For Sale'});
 
-        /////////////////////////////////////////
-
-        TradePanel.set({visible: isTraded});
-        BuyBtn.set({text:"BUY BUY", background:'green', color:'white', enabled:true, defaultState:true});
-        BuyBtn.onClick(async()=>{
-          BuyBtn.set({text:"purchasing...", background:'blue', disabled:true});
-          const[success, result]=await request(`POST /buyOffer/${dog.offer._id}`);
-          if(!success){throw result}
-
-          updateDog();
-        });
-
-        /////////////////////////////////////////
-
-        MyDog.set({visible: ownedByViewer});
-
-        Sell.set({text:"SELL SELL", background:'red', color:'white', enabled:true, defaultState:true});
-        Sell.set({visible:!hasOffer});
-        Sell.onClick(async()=>{
-          Sell.set({text:"selling...", background:'brown', disabled:true});
-          const[success, result]=await request(`POST /makeOffer/${dog._id}`);
-          if(!success){throw result}
+        /* ——— BUY ——— */
+        TradePanel.set({visible:isTraded});
+        BuyBtn.set({text:'Buy',disabled:false});
+        BuyBtn.onClick(()=>run(async()=>{
+          BuyBtn.set({text:'Purchasing…',disabled:true});
+          const [ok,res] = await request(`POST /buyOffer/${dog.offer._id}`);
+          if(!ok) throw res;
           await updateDog();
-          Sell.set({text:"SELL SELL", background:'red', enabled:true});
-        });
+        }));
 
-        UnsellBtn.set({text:"UNSELL", background:'green', color:'white', enabled:true, defaultState:true});
-        UnsellBtn.set({visible:hasOffer});
-        UnsellBtn.onClick(async()=>{
-          UnsellBtn.set({text:"recollecting...", background:'black', disabled:true});
-          const[success, result]=await request(`DELETE /deleteOffer/${dog.offer._id}`);
-          if(!success){throw result}
+        /* ——— SELL / UNSELL / UNREGISTER (owner only) ——— */
+        MyDog.set({visible:ownedByViewer});
+
+        /* SELL */
+        Sell.set({text:'Sell',visible:!hasOffer,disabled:false});
+        Sell.onClick(()=>run(async()=>{
+          Sell.set({text:'Selling…',disabled:true});
+          const[ok,res]=await request(`POST /makeOffer/${dog._id}`);
+          if(!ok) throw res;
           await updateDog();
-          UnsellBtn.set({text:"UNSELL", background:'green', enabled:true});
-        });
+        }));
 
-        /////////////////////////////////////////
+        /* UNSELL */
+        UnsellBtn.set({text:'Cancel Sale',visible:hasOffer,disabled:false});
+        UnsellBtn.onClick(()=>run(async()=>{
+          UnsellBtn.set({text:'Cancelling…',disabled:true});
+          const[ok,res]=await request(`DELETE /deleteOffer/${dog.offer._id}`);
+          if(!ok) throw res;
+          await updateDog();
+        }));
+
+        /* UNREGISTER  */
+        UnregisterBtn.set({text:'Unregister',visible:ownedByViewer,disabled:false});
+        UnregisterBtn.onClick(()=>run(async()=>{
+          if(!confirm('Permanently remove this dog?')) return;
+          UnregisterBtn.set({text:'Removing…',disabled:true});
+          const[ok,res]=await request(`DELETE /unregisterDog/${dog._id}`);
+          if(!ok) throw res;
+          /* after unregister go back to profile */
+          window.location.href = `/UserProfile/${dog.owner._id}`;
+        }));
       });
     </script>
 
   </main>
-
 </body>
 </html>

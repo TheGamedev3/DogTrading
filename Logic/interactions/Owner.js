@@ -11,7 +11,7 @@ module.exports = {
         {
             name: {
                 type: String,
-                required: false,
+                required: [true, "username can't be blank!"],
                 unique: false
             },
             email: {
@@ -36,10 +36,11 @@ module.exports = {
             }
         },
         {
-            async saveAs(){
-                const salt = await bcrypt.genSalt();
-                this.password = await bcrypt.hash(this.password, salt);
-            },
+            // (its encrypted manually instead of on save, because if the object is modified again, it will double encrypt and change the password)
+            //async saveAs(){
+            //    const salt = await bcrypt.genSalt();
+            //    this.password = await bcrypt.hash(this.password, salt);
+            //},
             async login(email, password){
                 return await err_catcher(async()=>{
                     const user = await this.findOne({ email });
@@ -51,9 +52,21 @@ module.exports = {
                     throw new FieldError('email', 'incorrect email');
                 });
             },
+            async processPassword(password){
+                password = password.trim();
+                // sanitizing the password must come before it gets saved into mongoose,
+                // because the password needing to be encrypted before hand gets around mongoose's native password sanitizing
+                if(password === ''){throw new FieldError('password', "password can't be empty!")}
+                if(password.length < 6){throw new FieldError('password', 'password must be at minimum 6 characters!')}
+                const salt = await bcrypt.genSalt();
+                return await bcrypt.hash(password, salt);
+            },
             async signup(email, password){
                 return await err_catcher(async()=>{
-                    return await this.create({email, password});
+                    return await this.create({
+                        email,
+                        password:await this.processPassword(password)
+                    });
                 },
                     {code: 11000, field: 'email', reason: 'this email is already registered!'}
                 );
@@ -74,14 +87,18 @@ module.exports = {
                 const notAllowed = cantModify.filter(item=>keys.includes(item));
                 if(notAllowed.length > 0)throw new FieldError('props', `Attempted to modify: ${notAllowed.join(', ')} under Owner!`);
 
-                if(props.password || props.email){
+                if(props.password !== undefined || props.email !== undefined){
                     const oldPassword = props.oldPassword;
-                    if(!oldPassword)throw new FieldError('password', 'must retype old password to change email or password!');
-                    delete props.oldPassword;
+                    if(oldPassword === undefined)throw new FieldError('oldPassword', 'must retype old password to change email or password!');
                     const auth = await bcrypt.compare(oldPassword, owner.password);
                     if(!auth)throw new FieldError('oldPassword', 'incorrect old password!');
-                }
+                    delete props.oldPassword;
 
+                    if(props.password){
+                        props.password = await this.processPassword(props.password);
+                    }
+                }
+                
                 Object.assign(owner, props);
                 return await owner.save();
             },
@@ -98,12 +115,26 @@ module.exports = {
 
             // used for debug/seeding
             async createDummy(props){
+                if(props.password){
+                    props.password = await this.processPassword(props.password);
+                }
                 return await this.create(props);
             },
 
-            async delete(ownerId){
+            async delete(ownerId) {
+                const { Dog } = require('@Chemicals');
+
+                // Find all dogs of the user
+                const allDogs = await Dog.DogsOf(ownerId);
+                const dogIds = allDogs.map(d => d._id);
+
+                // Cascade delete dogs + their offers (via Dog.delete)
+                await Promise.all(dogIds.map(id => Dog.delete(id)));
+
+                // Now delete the owner
                 const deleted = await this.findByIdAndDelete(ownerId);
                 if (!deleted) throw new FieldError('ownerId', 'Owner does not exist or was already deleted');
+
                 return deleted;
             },
 
