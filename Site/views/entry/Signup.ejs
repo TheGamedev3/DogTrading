@@ -1,17 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Signup</title>
+  <meta charset="utf-8">
+  <title>Sign Up</title>
 </head>
-<body>
+
+<body style="font-family:sans-serif;margin:0;padding:0;">
+
   <%- include('../shared/Header') %>
-  <main style="padding: 2rem;">
-    <h2>Create Your Account</h2>
-    <form action="/signup" method="POST">
-      <input name="email" type="email" placeholder="Email" required><br><br>
-      <input name="password" type="password" placeholder="Password" required><br><br>
-      <button type="submit">Sign Up</button>
-    </form>
+
+  <main style="padding:2rem;max-width:600px;margin:auto;">
+
+    <h1 style="margin-top:0;">Create Your Account</h1>
+
+    <!-- Name -->
+    <div style="margin:1rem 0;">
+      <label for="signupName"><strong>Name:</strong></label>
+      <input id="signupName" type="text" placeholder="e.g. Alex"
+             style="width:100%;margin-top:0.25rem;">
+    </div>
+
+    <!-- Email -->
+    <div style="margin:1rem 0;">
+      <label for="signupEmail"><strong>Email:</strong></label>
+      <input id="signupEmail" type="email" placeholder="you@example.com"
+             style="width:100%;margin-top:0.25rem;">
+    </div>
+
+    <!-- Password -->
+    <div style="margin:1rem 0;">
+      <label for="signupPassword"><strong>Password:</strong></label>
+      <input id="signupPassword" type="password" placeholder="minimum 6 characters"
+             style="width:100%;margin-top:0.25rem;">
+    </div>
+
+    <!-- Profile-picture preview + URL -->
+    <div style="margin:1rem 0;display:flex;flex-direction:column;gap:0.75rem;">
+
+      <!-- preview -->
+      <div style="display:flex;align-items:flex-start;gap:1rem;">
+        <div>
+          <img id="pfpPreview" src=""
+               style="width:220px;border-radius:8px;border:1px solid #ccc;">
+          <p id="pfpUnavailable"><em>No profile picture available.</em></p>
+        </div>
+      </div>
+
+      <!-- URL input -->
+      <div>
+        <label for="pfpURL"><strong>Profile Picture URL:</strong></label>
+        <input id="pfpURL" type="text" placeholder="https://…"
+               style="width:100%;margin-top:0.25rem;">
+      </div>
+    </div>
+
+    <!-- Error banner -->
+    <p id="signupError" style="color:#c00;display:none;"></p>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+      <button id="signupBtn" class="action-btn buy" style="flex:1;">Sign Up</button>
+      <button id="signupBackBtn" class="action-btn unsell" style="flex:1;">Back</button>
+    </div>
+
+    <!-- ⚙️ Page logic -->
+    <script>
+      StaticState(({ DynamicEJSelements, request }) => {
+        const [
+          signupName, signupEmail, signupPassword,
+          pfpPreview, pfpUnavailable, pfpURL,
+          signupError,
+          signupBtn, signupBackBtn
+        ] = DynamicEJSelements(
+          'signupName','signupEmail','signupPassword',
+          'pfpPreview','pfpUnavailable','pfpURL',
+          'signupError',
+          'signupBtn','signupBackBtn'
+        );
+
+        /* util */
+        function showErr(msg){ signupError.set({text:msg,visible:true}); }
+        function clearErr(){   signupError.set({visible:false,text:''}); }
+
+        /* live image preview */
+        function updatePreview(){
+          const url = pfpURL.getValue();
+          pfpPreview.set({src:url,visible:url});
+          pfpUnavailable.set({visible:!url});
+        }
+        updatePreview();
+        pfpURL.onTextSubmit(updatePreview);
+
+        /* Sign Up */
+        signupBtn.onClick(async()=>{
+          clearErr();
+          const name  = signupName.getValue();
+          const email = signupEmail.getValue();
+          const pwd   = signupPassword.getValue();
+          const pfp   = pfpURL.getValue();
+
+          signupName.errorIf('Name required',!name);
+          signupEmail.errorIf('Email required',!email);
+          signupPassword.errorIf('Password required',!pwd);
+          if(!name||!email||!pwd) return;
+
+          signupBtn.set({text:'Signing up…',disabled:true});
+
+          const [ok,res] =
+            await request('POST /signup',{name,profile:pfp,email,password:pwd});
+
+          if(!ok){
+            signupName.displayError(res.name);
+            signupEmail.displayError(res.email);
+            signupPassword.displayError(res.password);
+            if(res.server) showErr(res.server);
+            signupBtn.set({text:'Sign Up',disabled:false});
+            return;
+          }
+          /* success → backend returns new user */
+          window.location.href = `/UserProfile/${res._id}`;
+        });
+
+        /* Back */
+        signupBackBtn.onClick(()=>history.back());
+      });
+    </script>
+
   </main>
 </body>
 </html>

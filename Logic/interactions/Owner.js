@@ -42,15 +42,13 @@ module.exports = {
             //    this.password = await bcrypt.hash(this.password, salt);
             //},
             async login(email, password){
-                return await err_catcher(async()=>{
-                    const user = await this.findOne({ email });
-                    if (user) {
-                        const auth = await bcrypt.compare(password, user.password);
-                        if(auth)return user;
-                        throw new FieldError('password', 'incorrect password');
-                    }
-                    throw new FieldError('email', 'incorrect email');
-                });
+                const user = await this.findOne({ email });
+                if (user) {
+                    const auth = await bcrypt.compare(password, user.password);
+                    if(auth)return user;
+                    throw new FieldError('password', 'incorrect password');
+                }
+                throw new FieldError('email', 'incorrect email');
             },
             async processPassword(password){
                 password = password.trim();
@@ -61,15 +59,12 @@ module.exports = {
                 const salt = await bcrypt.genSalt();
                 return await bcrypt.hash(password, salt);
             },
-            async signup(email, password){
-                return await err_catcher(async()=>{
-                    return await this.create({
-                        email,
-                        password:await this.processPassword(password)
-                    });
-                },
-                    {code: 11000, field: 'email', reason: 'this email is already registered!'}
-                );
+            async signup(name, profile, email, password){
+                return await this.create({
+                    name, profile,
+                    email,
+                    password:await this.processPassword(password)
+                });
             },
             async fetchUser(id){
                 return await this.findOne({ _id:id });

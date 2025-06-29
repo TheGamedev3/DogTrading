@@ -107,7 +107,7 @@ module.exports = {
                 offer.dog = await Dog.findOne({_id: offer.dog});
             })
         );
-        return offers.map((offer)=>{
+        return offers.filter((offer)=>Boolean(offer.dog)).map((offer)=>{
             const{
                 profile, name, _id
             } = offer.dog;

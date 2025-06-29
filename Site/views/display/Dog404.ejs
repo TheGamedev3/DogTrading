@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>404 | Dog Not Found</title>
+</head>
+
+<body style="font-family:sans-serif;margin:0;padding:0;">
+  <!-- main nav -->
+  <%- include('../shared/Header') %>
+
+  <main style="padding:2rem;max-width:600px;margin:auto;text-align:center;">
+    <h1 id="dog404msg"
+        style="font-weight:600;font-size:1.5rem;margin:0;">
+      <!-- fallback if JS disabled -->
+      404, dog <%= typeof dogId !== 'undefined' ? dogId : '' %> was not found!
+    </h1>
+  </main>
+
+  <!-- overwrite message with the session-bound ID (safer) -->
+  <script>
+    StaticState(({ DynamicEJSelements, session }) => {
+      const [msg] = DynamicEJSelements('dog404msg');
+      const id = session.dogId || '<unknown>';
+      msg.set({ text: `404, dog ${id} was not found!` });
+    });
+  </script>
+</body>
+</html>

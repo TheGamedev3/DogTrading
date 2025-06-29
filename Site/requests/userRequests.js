@@ -10,29 +10,34 @@ module.exports = function createRoutes({route}){
     });
 
     route.preVerified('POST /signup', async({inputs, req, json})=>{
-        // replace this with an err catcher forum thingy
+        const [success, result] = await err_catcher(
+            async()=>{
+                const{name, profile, email, password} = inputs;
+                const user = await Owner.signup(name, profile, email, password);
+                await req.verifyUser(user);
+                req.session.justLoggedIn = true;
+                return user;
+            },
+            {code: 11000, field: 'email', reason: 'this email is already registered!'} // (rename one of the err codes)
+        );
 
-        const result = await Owner.signup(inputs.email, inputs.password);
-        if(result && result.err !== true){
-            const user = result;
-            req.verifyUser(user);
-            return await json(200, user);
+        if(success){
+            const user = result; return await json(200, user);
         }else{
             return await json(500, result);
         }
     });
-    route.preVerified('POST /login', async({inputs, req, res, json})=>{
-        const result = await err_catcher(async()=>{
+    route.preVerified('POST /login', async({inputs, req, json})=>{
+        const [success, result] = await err_catcher(async()=>{
             const user = await Owner.login(inputs.email, inputs.password);
             await req.verifyUser(user);
             req.session.justLoggedIn = true;
             return user;
         });
-        if(result && typeof result === 'object' && result.err === true){
-            return await json(500, result);
+        if(success){
+            const user = result; return await json(200, user);
         }else{
-            const user = result;
-            return res.redirect(`/UserProfile/${user._id}`);
+            return await json(500, result);
         }
     });
 

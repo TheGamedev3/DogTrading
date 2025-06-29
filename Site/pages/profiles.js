@@ -6,13 +6,17 @@ module.exports = function createRoutes({ Webpage }){
 
     // route the user's page to their user Id
     const{Owner, Dog} = require('@Chemicals');
+    const { err_catcher } = require('@MongooseAPI');
 
     Webpage(
         "/DogProfile/:dogId",
         "display/DogProfile",
         {
-            injectInfo: async({params})=>{
-                return { dog: await Dog.pageData(params.dogId) };
+            injectInfo: async({params, setFile})=>{
+                const dogId = params.dogId;
+                const [found, dog] = await err_catcher(async()=>await Dog.pageData(dogId));
+                if(!found){setFile("display/Dog404")}
+                return {dog, found, dogId};
             }
         }
     );
@@ -21,10 +25,13 @@ module.exports = function createRoutes({ Webpage }){
         "/UserProfile/:userId",
         "display/UserProfile",
         {
-            injectInfo: async({userId, params})=>{
+            injectInfo: async({userId, params, setFile})=>{
+                const pageUserId = params.userId;
+                const [found, pageUser] = await err_catcher(async()=>await Owner.pageData(pageUserId));
+                if(!found){setFile("display/User404")}
                 return {
-                    myProfile: userId === params.userId,
-                    pageUser: await Owner.pageData(params.userId)
+                    myProfile: userId === pageUserId,
+                    pageUserId, pageUser, found
                 };
             }
         }

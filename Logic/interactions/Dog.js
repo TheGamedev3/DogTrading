@@ -26,16 +26,14 @@ module.exports = {
     },
     {
       async setOwner(dogId, newOwnerId){
-        return await err_catcher(async()=>{
-            const dog = await this.findOne({ _id: dogId });
-            if(!dog)throw new FieldError('dogId', 'Dog does not exist');
-            if(dog.owner.toString() === newOwnerId.toString())throw new FieldError('newOwnerId', 'Owner Already Owns Dog!');
+        const dog = await this.findOne({ _id: dogId });
+        if(!dog)throw new FieldError('dogId', 'Dog does not exist');
+        if(dog.owner.toString() === newOwnerId.toString())throw new FieldError('newOwnerId', 'Owner Already Owns Dog!');
 
-            if(!(await Owner.isReal(newOwnerId)))throw new FieldError('newOwnerId', 'Owner does not exist');
+        if(!(await Owner.isReal(newOwnerId)))throw new FieldError('newOwnerId', 'Owner does not exist');
 
-            dog.owner = newOwnerId; await dog.save();
-            return dog;
-        });
+        dog.owner = newOwnerId; await dog.save();
+        return dog;
       },
       async registerDog(name, ownerId, image=''){
         if(ownerId !== undefined && !(await Owner.isReal(ownerId)))
@@ -46,26 +44,22 @@ module.exports = {
         return await this.create(object);
       },
       async DogsOf(ownerId, sortStyle){
-        return await err_catcher(async()=>{
-            if(!(await Owner.isReal(ownerId)))
-            {throw new FieldError('ownerId', 'Owner does not exist')}
+          if(!(await Owner.isReal(ownerId)))
+          {throw new FieldError('ownerId', 'Owner does not exist')}
 
-            return await this.find({ owner: ownerId }).complexSort(sortStyle);
-        });
+          return await this.find({ owner: ownerId }).complexSort(sortStyle);
       },
       async modify(dogId, props){
-        return await err_catcher(async()=>{
-          const dog = await this.findOne({ _id: dogId });
-          if(!dog)throw new FieldError('dogId', 'Dog does not exist');
+        const dog = await this.findOne({ _id: dogId });
+        if(!dog)throw new FieldError('dogId', 'Dog does not exist');
 
-          const cantModify = ['_id', 'owner'];
-          const keys = Object.keys(props);
-          const notAllowed = cantModify.filter(item=>keys.includes(item));
-          if(notAllowed.length > 0)throw new FieldError('props', `Attempted to modify: ${notAllowed.join(', ')} under Dog!`);
+        const cantModify = ['_id', 'owner'];
+        const keys = Object.keys(props);
+        const notAllowed = cantModify.filter(item=>keys.includes(item));
+        if(notAllowed.length > 0)throw new FieldError('props', `Attempted to modify: ${notAllowed.join(', ')} under Dog!`);
 
-          Object.assign(dog, props);
-          return await dog.save();
-        });
+        Object.assign(dog, props);
+        return await dog.save();
       },
 
       async selfOwnsDog(ownerId, dogId){
@@ -89,11 +83,12 @@ module.exports = {
         const pageDog = await this.findOne({ _id: dogId }).lean();
         // else page dog unavaliable!!!
 
-        const dogOwner = await Owner.findOne({ _id: pageDog.owner }).lean();
-        // impossible not to have an owner!
+        const ownerId = pageDog.owner;
+        const dogOwner = await Owner.findOne({ _id: ownerId }).lean();
 
         pageDog.owner = dogOwner;
-        pageDog.ownerLink = `/UserProfile/${dogOwner._id}`;
+        pageDog.ownerNotFound = Boolean(dogOwner);
+        pageDog.ownerLink = `/UserProfile/${ownerId}`;
 
         pageDog.offer = await Offer.OfferOfDog(pageDog._id);
         return pageDog;
@@ -120,9 +115,10 @@ module.exports = {
       async getIconData(dogs){
         const{Offer} = require('./Offer');
         await Promise.all(
-            dogs.map(async (dog) => {
-                dog.offer = await Offer.OfferOfDog(dog._id);
-            })
+          dogs.map(async (dog) => {
+            const [found, offer] = await err_catcher(async () => await Offer.OfferOfDog(dog._id));
+            if(found){dog.offer = offer}
+          })
         );
         return dogs.map(({
             profile, name, _id, offer

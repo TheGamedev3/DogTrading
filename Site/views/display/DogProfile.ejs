@@ -68,7 +68,10 @@
         let dog = session.dog;
         let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
         
-        ownerLink.set({text:dog.owner.name, href:`/UserProfile/${dog.owner._id}`});
+        ownerLink.set({
+          text:session.ownerNotFound ? '[owner not found!]' : dog.owner.name,
+          href:`/UserProfile/${dog.owner._id}`
+        });
 
         async function updateDog(){
           const[success2, result2]=await request(`GET /dog/${dog._id}`);

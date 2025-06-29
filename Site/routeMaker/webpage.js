@@ -10,7 +10,13 @@ module.exports = function Webpage(name, file, args={}){
         }
         delete pageArgs.injectInfo;
         const injectInfo = args.injectInfo;
-        if(injectInfo){Object.assign(pageArgs, await injectInfo(pageArgs))}
+        if(injectInfo){
+            const extraInfo = await injectInfo({
+                    ...pageArgs, 
+                    setFile:(newFile)=>{file = newFile}
+            });
+            if(extraInfo)Object.assign(pageArgs, extraInfo);
+        }
         return routeArgs.page(pageArgs.errCode || 200, file, pageArgs);
     }
     if(args.preVerified){

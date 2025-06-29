@@ -118,7 +118,7 @@ window.StaticState=function(stateDefinition){
                 get(){ return document.getElementById(id); }
             };
 
-            ejsInstance.displayError = (msg = "Invalid input") => {
+            ejsInstance.displayError = (msg) => {
                 if(msg === undefined || msg === null){ejsInstance.clearError(); return}
                 const el = document.getElementById(id); if (!el) return;
 

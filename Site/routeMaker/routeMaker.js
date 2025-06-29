@@ -32,12 +32,11 @@ function createAllRoutes(...routeCreators){
             async json(status, object){
                 let success = true;
                 if(typeof object === 'function'){
-                    const result = await err_catcher(
+                    const [s2, result] = await err_catcher(
                         object,
                         {oldName:"failed: name: username", rename:"username can't be blank!"}
                     );
-                    success = !(result && typeof result === 'object' && result.err===true);
-                    object = result;
+                    success = s2; object = result;
                 }
                 if(!success){
                     if(typeof result === 'object' && result.code !== undefined){

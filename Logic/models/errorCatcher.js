@@ -2,7 +2,7 @@
 
 async function err_catcher(func, ...fieldErrors){
   try{
-    return await func();
+    return [true, await func()];
   }catch(err){
     const errors = { err:true };
 
@@ -38,7 +38,7 @@ async function err_catcher(func, ...fieldErrors){
       errors.message = detailKeys.map(k=>errors[k]).join(', ');
     }
 
-    return errors;
+    return [false, errors];
   }
 }
 

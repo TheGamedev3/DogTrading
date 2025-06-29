@@ -1,37 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
+  <meta charset="utf-8">
+  <title>Log In</title>
 </head>
-<body>
+
+<body style="font-family:sans-serif;margin:0;padding:0;">
+
+  <!-- main nav -->
   <%- include('../shared/Header') %>
 
-  <main style="padding: 2rem;">
-    <h2>Log In</h2>
+  <main style="padding:2rem;max-width:600px;margin:auto;">
 
-    <% if (justLoggedIn) { %>
-      <p style="color: green;">✅ Thanks for logging in!</p>
-    <% } %>
+    <h1 style="margin-top:0;">Log In</h1>
 
-    <form action="/login" method="POST">
-      <input name="email" type="email" placeholder="Email" required><br><br>
-      <input name="password" type="password" placeholder="Password" required><br><br>
-      <button type="submit">Log In</button>
-    </form>
-
-    <div style="margin-top: 2rem; padding: 1rem; background: #f3f3f3; border: 1px solid #ccc;">
-      <p style="margin: 0 0 0.5rem;"><strong>(test-accounts for dev purposes)</strong></p>
-      <ul style="list-style: none; padding-left: 0;">
-        <li><code>ryan@gmail.com</code> / <code>444421</code></li>
-        <li><code>aaron@gmail.com</code> / <code>223121212</code></li>
-        <li><code>sarah@gmail.com</code> / <code>afa655a5</code></li>
-        <li><code>gary@gmail.com</code> / <code>Aaaaa22222</code></li>
-        <li><code>maurice@gmail.com</code> / <code>ZXCVB123</code></li>
-        <li><code>laura@gmail.com</code> / <code>0987654</code></li>
-        <li><code>frank@gmail.com</code> / <code>5%5%123</code></li>
-        <li><code>miranda@gmail.com</code> / <code>!!!!!Abc</code></li>
-      </ul>
+    <!-- Email -->
+    <div style="margin:1rem 0;">
+      <label for="loginEmail"><strong>Email:</strong></label>
+      <input id="loginEmail" type="email" placeholder="you@example.com"
+             style="width:100%;margin-top:0.25rem;">
     </div>
+
+    <!-- Password -->
+    <div style="margin:1rem 0;">
+      <label for="loginPassword"><strong>Password:</strong></label>
+      <input id="loginPassword" type="password" placeholder="••••••"
+             style="width:100%;margin-top:0.25rem;">
+    </div>
+
+    <!-- Error banner -->
+    <p id="loginError" style="color:#c00;display:none;"></p>
+
+    <!-- Action buttons -->
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;">
+      <button id="loginBtn" class="action-btn buy" style="flex:1;">Log&nbsp;In</button>
+      <button id="loginBackBtn" style="flex:1;"
+              class="action-btn unsell">Back</button>
+    </div>
+
+    <p style="margin: 0 0 0.5rem;"><strong>(test-accounts for dev purposes)</strong></p>
+    <ul style="list-style: none; padding-left: 0;">
+      <li><code>ryan@gmail.com</code> / <code>444421</code></li>
+      <li><code>aaron@gmail.com</code> / <code>223121212</code></li>
+      <li><code>sarah@gmail.com</code> / <code>afa655a5</code></li>
+      <li><code>gary@gmail.com</code> / <code>Aaaaa22222</code></li>
+      <li><code>maurice@gmail.com</code> / <code>ZXCVB123</code></li>
+      <li><code>laura@gmail.com</code> / <code>0987654</code></li>
+      <li><code>frank@gmail.com</code> / <code>5%5%123</code></li>
+      <li><code>miranda@gmail.com</code> / <code>!!!!!Abc</code></li>
+    </ul>
+
+    <!-- ⚙️ Page logic -->
+    <script>
+      StaticState(({ DynamicEJSelements, session, request }) => {
+        const [
+          loginEmail, loginPassword,
+          loginError,
+          loginBtn,    loginBackBtn
+        ] = DynamicEJSelements(
+          'loginEmail','loginPassword',
+          'loginError',
+          'loginBtn','loginBackBtn'
+        );
+
+        /* helpers */
+        function showError(msg){ loginError.set({text:msg,visible:true}); }
+        function clearError(){   loginError.set({visible:false,text:''}); }
+
+        /* Log-in */
+        loginBtn.onClick(async()=>{
+          clearError();
+          const email = loginEmail.getValue();
+          const pwd   = loginPassword.getValue();
+
+          loginEmail.errorIf('Email required', !email);
+          loginPassword.errorIf('Password required', !pwd);
+          if(!email||!pwd) return;
+
+          loginBtn.set({text:'Logging in…',disabled:true});
+
+          const [ok,res] = await request('POST /login', {email, password:pwd});
+
+          if(!ok){
+            loginEmail.displayError(res.email);
+            loginPassword.displayError(res.password);
+            if(res.server) showError(res.server);
+            loginBtn.set({text:'Log In',disabled:false});
+            return;
+          }
+          /* success → backend returns user doc */
+          window.location.href = `/UserProfile/${res._id}`;
+        });
+
+        /* Back */
+        loginBackBtn.onClick(()=>history.back());
+      });
+    </script>
+
   </main>
 </body>
 </html>
