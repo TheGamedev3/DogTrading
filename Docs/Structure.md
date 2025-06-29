@@ -102,3 +102,11 @@ Site/
    If the server encounters validation errors:
    - `err_catcher()` returns a breakdown of failed fields.
    - These are shown directly under each field in the form.
+
+
+
+# Module Format Note
+This project primarily uses CommonJS (CJS) rather than modern ES Modules (ESM).
+This decision was made to maintain consistency with the tutorial materials provided in the assignment, which also relied on CommonJS syntax.
+
+As a result, certain dependencies—such as the Mocha and Chai testing frameworks—are pinned to older versions to ensure compatibility with the CJS-based structure.

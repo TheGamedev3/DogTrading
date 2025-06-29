@@ -6,7 +6,7 @@
 ✅ trades/dogs show/hide if 0 length
 
 ✅ delete dog
-delete account
+✅ delete account
 
 ✅ register dog
 

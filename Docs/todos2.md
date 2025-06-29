@@ -32,10 +32,10 @@ today 6/27/2025:
     ✅ - greetings, thanks for logging in message
     ✅ - thanks for adopting message
 
-- center the pagnation pages, (they're to the left)
+✅ - center the pagnation pages, (they're to the left)
+✅ - describe the outdated cjs code design choices in the docs
 
 - screenshots of the site
-- describe the outdated cjs code design choices in the docs
 - mongoose offline mode stub
 - page request stubs
 
