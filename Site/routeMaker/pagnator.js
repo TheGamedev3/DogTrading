@@ -30,8 +30,7 @@ module.exports = function PagerPage(pageRoute, header, table, perPage, criteria=
             sortStyle: pageData.sortStyle,
 
             user, userId,
-            profiles,
-            justLoggedIn:false
+            profiles
         });
     }
     return route.either(`GET /${pageRoute}`, pager);

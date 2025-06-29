@@ -238,11 +238,11 @@
         /* ——— BUY ——— */
         TradePanel.set({visible:isTraded});
         BuyBtn.set({text:'Buy',disabled:false});
-        BuyBtn.onClick(()=>run(async()=>{
-          BuyBtn.set({text:'Purchasing…',disabled:true});
-          const [ok,res] = await request(`POST /buyOffer/${dog.offer._id}`);
-          if(!ok) throw res;
-          await updateDog();
+        BuyBtn.onClick(() => run(async () => {
+          BuyBtn.set({ text: 'Purchasing…', disabled: true });
+          const [ok, res] = await request(`POST /buyOffer/${dog.offer._id}`);
+          if (!ok) throw res;
+          window.location.href = `/DogProfile/${dog._id}`;
         }));
 
         /* ——— SELL / UNSELL / UNREGISTER (owner only) ——— */

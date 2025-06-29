@@ -46,8 +46,16 @@
   </div>
 </header>
 
-<% if (justLoggedIn) { %>
-  <div style="padding: 1rem; background-color: #d0f0c0; border: 1px solid #8bc34a; margin-bottom: 1rem;">
-    ✅ Thanks for logging in, <%= user.name || user.email %>!
+<% if (message) { %>
+  <div style="
+    padding: 1rem;
+    background-color: <%= message.bg || '#d0f0c0' %>;
+    color: <%= message.color || 'black' %>;
+    border: 1px solid #ccc;
+    margin-bottom: 1rem;
+    text-align: center;
+  ">
+    <b><%= message.text %></b>
   </div>
 <% } %>
+

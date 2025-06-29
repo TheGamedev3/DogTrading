@@ -4,7 +4,6 @@ module.exports = function Webpage(name, file, args={}){
     const fullRoute = `GET ${name}`;
     async function pageRoute(routeArgs){
         const pageArgs={
-            justLoggedIn:false,
             ...routeArgs,
             ...args
         }
@@ -12,8 +11,8 @@ module.exports = function Webpage(name, file, args={}){
         const injectInfo = args.injectInfo;
         if(injectInfo){
             const extraInfo = await injectInfo({
-                    ...pageArgs, 
-                    setFile:(newFile)=>{file = newFile}
+                ...pageArgs, 
+                setFile:(newFile)=>{file = newFile}
             });
             if(extraInfo)Object.assign(pageArgs, extraInfo);
         }

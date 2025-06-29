@@ -65,8 +65,12 @@ function createAllRoutes(...routeCreators){
                     }
                 }
 
+                const pageMessage = req.session.message || null;
+                delete req.session.message;
+
                 return res.status(status).render(file, {
                     ...args,
+                    message: pageMessage,
                     args: safeArgs
                 });
             },

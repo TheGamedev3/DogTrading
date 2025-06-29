@@ -28,9 +28,11 @@ today 6/27/2025:
 ✅ - signup, add name and profile picture along with account
     ✅ - show signup attempt errors, like name can't be blank
     ✅ - also make login page consistent with field things
-- message flag
-    - thanks for adopting message
-    - greetings, thanks for logging in message
+✅ - message flag
+    ✅ - greetings, thanks for logging in message
+    ✅ - thanks for adopting message
+
+- center the pagnation pages, (they're to the left)
 
 - screenshots of the site
 - describe the outdated cjs code design choices in the docs

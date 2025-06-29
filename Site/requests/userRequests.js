@@ -15,7 +15,11 @@ module.exports = function createRoutes({route}){
                 const{name, profile, email, password} = inputs;
                 const user = await Owner.signup(name, profile, email, password);
                 await req.verifyUser(user);
-                req.session.justLoggedIn = true;
+                req.session.message = {
+                    text: `✅ Thanks for signing up, ${user.name || user.email}!`,
+                    bg: '#d0f0c0',
+                    color: 'black'
+                };
                 return user;
             },
             {code: 11000, field: 'email', reason: 'this email is already registered!'} // (rename one of the err codes)
@@ -31,7 +35,11 @@ module.exports = function createRoutes({route}){
         const [success, result] = await err_catcher(async()=>{
             const user = await Owner.login(inputs.email, inputs.password);
             await req.verifyUser(user);
-            req.session.justLoggedIn = true;
+            req.session.message = {
+                text: `✅ Thanks for logging in, ${user.name || user.email}!`,
+                bg: '#d0f0c0',
+                color: 'black'
+            };
             return user;
         });
         if(success){
