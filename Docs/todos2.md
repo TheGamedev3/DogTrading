@@ -39,8 +39,13 @@ today 6/27/2025:
 - mongoose offline mode stub
 - page request stubs
 
-- learn how to make mocha and chai tests better
+✅ - learn how to make mocha and chai tests better
     - signup test
-    - login user edit page test
+    - login users
+    - edit user page test
     - create dog test
-    - sell dog test, and trade dog test
+    - edit dog test
+    - sell dog test, and trade dog test, delete dog
+    - delete user, check if dog and offer is deleted
+    - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
+

@@ -48,8 +48,6 @@ function createAllRoutes(...routeCreators){
                 res.status(status).json(object);
             },
             page(status, file, args = {}) {
-                // if test mode, args and file should be directly accessible, and not an actual page returning
-
                 const safeArgs = {};
 
                 // Copy only what you need for the frontend
@@ -68,11 +66,16 @@ function createAllRoutes(...routeCreators){
                 const pageMessage = req.session.message || null;
                 delete req.session.message;
 
-                return res.status(status).render(file, {
+                const pageArgs = {
                     ...args,
                     message: pageMessage,
                     args: safeArgs
-                });
+                };
+                // if test mode, args and file should be directly accessible, and not an actual page returning!
+                // this is because the route testers don't simulate the dom!
+                const testMode = process.env.NODE_ENV === 'test';
+                if(testMode){return res.status(status).json(pageArgs)}
+                else{return res.status(status).render(file, pageArgs)}
             },
             skip:next
         }
