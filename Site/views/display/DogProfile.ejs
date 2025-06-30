@@ -65,12 +65,13 @@
           "ownerLink"
         );
 
-        let dog = session.dog;
-        let ownedByViewer = session.userId && (dog.owner._id.toString() === session.userId.toString());
+        let {dog} = session;
+        let {ownerNotFound, ownerLink:ownerHref} = dog;
+        let ownedByViewer = session.userId && !ownerNotFound && (dog.owner._id.toString() === session.userId.toString());
         
         ownerLink.set({
-          text:session.ownerNotFound ? '[owner not found!]' : dog.owner.name,
-          href:`/UserProfile/${dog.owner._id}`
+          text: ownerNotFound ? '[owner not found!]' : dog.owner.name,
+          href: ownerHref
         });
 
         async function updateDog(){
@@ -206,9 +207,10 @@
           'MyDog','Sell','UnsellBtn','UnregisterBtn'
         );
 
-        let dog = session.dog;
-        let ownedByViewer = session.userId &&
-                            (dog.owner._id.toString() === session.userId.toString());
+        let {dog} = session;
+        let {ownerNotFound} = dog;
+        let ownedByViewer = session.userId && !ownerNotFound && (dog.owner._id.toString() === session.userId.toString());
+        
         let hasOffer   = Boolean(dog.offer) && dog.offer.status === 'available';
         let isTraded   = !ownedByViewer && hasOffer;
 

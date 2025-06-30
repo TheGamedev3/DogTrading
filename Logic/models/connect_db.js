@@ -5,6 +5,8 @@ module.exports.onConnect=async function(){
 
     let uri = process.env.MONGODB_URI;
     const testMode = process.env.NODE_ENV === 'test';
+
+    // use the "_test" database if in .env test mode
     uri = testMode
         ? uri.replace(/([^/]+)$/, '$1_test')
         : uri;

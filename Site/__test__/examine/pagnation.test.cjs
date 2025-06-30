@@ -22,10 +22,14 @@ siteEnvironment('Simulated dog trading scenario', ({expect, Agent, MongooseAPI})
             }
         })).profiles;
         console.log(page1OfDogs);
+        
+
+        const ryan = (await requester("GET /UserByName/ryan")).pageUser;
+        console.log(ryan);
+
+        const shamool = (await requester("GET /DogByName/shamool")).dog;
+        console.log(shamool);
     });
 
 });
-
-
-// this also calls for a fetch profile link via name!
 

@@ -51,7 +51,7 @@ module.exports={
                     const agent = chai.request.agent(app);
                     return{
                         agent,
-                        async requester(fullRoute, argsStruct){
+                        async requester(fullRoute, argsStruct={}){
                             const{
                                 query, body,
                                 assume='success', assumeCode
@@ -59,11 +59,14 @@ module.exports={
 
                             // make request sender
                             const{method, route} = parseRoute(fullRoute);
-                            let chain = agent[method](route);
 
-                            // send args
-                            if(query){chain = chain.query(query)}
-                            if(body){chain = chain.send(body)}
+                            let chain = agent[method](route)
+                                // allow it to follow redirects!
+                                .redirects(2);
+
+                                // send args
+                                if(query){chain = chain.query(query)}
+                                if(body){chain = chain.send(body)}
 
                             // send request & await result
                             const[success, result, response] = await (async()=>{

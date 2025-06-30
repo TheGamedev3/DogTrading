@@ -87,7 +87,7 @@ module.exports = {
         const dogOwner = await Owner.findOne({ _id: ownerId }).lean();
 
         pageDog.owner = dogOwner;
-        pageDog.ownerNotFound = Boolean(dogOwner);
+        pageDog.ownerNotFound = !Boolean(dogOwner);
         pageDog.ownerLink = `/UserProfile/${ownerId}`;
 
         pageDog.offer = await Offer.OfferOfDog(pageDog._id);

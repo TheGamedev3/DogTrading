@@ -5,7 +5,7 @@
 (node:14004) [DEP0066] DeprecationWarning: OutgoingMessage.prototype._headers is deprecated
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
-These deprciated warnings are probably from the outdated version of chaihttp being used
+These deprciated warnings are from the outdated version of chaihttp being used
 
 */
 

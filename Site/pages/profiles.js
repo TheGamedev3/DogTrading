@@ -42,4 +42,31 @@ module.exports = function createRoutes({ Webpage }){
         "display/CreateDog"
     );
 
+    const testMode = process.env.NODE_ENV === 'test';
+    if(testMode){
+        // exclusive test mode routes for easy of use/debugging redirectTo
+        Webpage(
+            "/UserByName/:name",
+            "",
+            {
+                injectInfo: async({params, redirectTo})=>{
+                    const pageName = params.name;
+                    const pageUser = await Owner.findOne({ name: new RegExp(`^${pageName}$`, 'i') });
+                    return redirectTo(`/UserProfile/${pageUser?._id || -1}`);
+                }
+            }
+        );
+
+        Webpage(
+            "/DogByName/:name",
+            "",
+            {
+                injectInfo: async({params, redirectTo})=>{
+                    const pageName = params.name;
+                    const pageDog = await Dog.findOne({ name: new RegExp(`^${pageName}$`, 'i') });
+                    return redirectTo(`/DogProfile/${pageDog?._id || -1}`);
+                }
+            }
+        );
+    }
 };

@@ -1,4 +1,5 @@
 
+
 const{route} = require('./routes');
 module.exports = function Webpage(name, file, args={}){
     const fullRoute = `GET ${name}`;
@@ -12,7 +13,8 @@ module.exports = function Webpage(name, file, args={}){
         if(injectInfo){
             const extraInfo = await injectInfo({
                 ...pageArgs, 
-                setFile:(newFile)=>{file = newFile}
+                setFile(newFile){file = newFile},
+                redirectTo(destination){pageArgs.redirect = destination}
             });
             if(extraInfo)Object.assign(pageArgs, extraInfo);
         }

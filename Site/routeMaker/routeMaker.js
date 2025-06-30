@@ -48,34 +48,35 @@ function createAllRoutes(...routeCreators){
                 res.status(status).json(object);
             },
             page(status, file, args = {}) {
-                const safeArgs = {};
-
-                // Copy only what you need for the frontend
-                for (const [key, value] of Object.entries(args)) {
-                    if (typeof value === 'object') {
-                    try {
-                        safeArgs[key] = JSON.parse(JSON.stringify(value));
-                    } catch (e) {
-                        safeArgs[key] = null;
-                    }
-                    } else {
-                    safeArgs[key] = value;
-                    }
+                const redirect = args.redirect;
+                if(redirect){
+                    delete args.redirect;
+                    return res.redirect(redirect);
                 }
 
                 const pageMessage = req.session.message || null;
                 delete req.session.message;
 
-                const pageArgs = {
-                    ...args,
-                    message: pageMessage,
-                    args: safeArgs
-                };
+                const pageArgs = {};
+
+                // Copy only what you need for the frontend
+                for (const [key, value] of Object.entries({...args, message: pageMessage})) {
+                    if (typeof value === 'object') {
+                    try {
+                        pageArgs[key] = JSON.parse(JSON.stringify(value));
+                    } catch (e) {
+                        pageArgs[key] = null;
+                    }
+                    } else {
+                    pageArgs[key] = value;
+                    }
+                }
+
                 // if test mode, args and file should be directly accessible, and not an actual page returning!
                 // this is because the route testers don't simulate the dom!
                 const testMode = process.env.NODE_ENV === 'test';
-                if(testMode){return res.status(status).json(pageArgs)}
-                else{return res.status(status).render(file, pageArgs)}
+                if(testMode){return res.status(status).json(pageArgs)} // (directly return the args in test mode)
+                else{return res.status(status).render(file, {...pageArgs, allArgs: pageArgs})} // (the format ejs expects for the args)
             },
             skip:next
         }
