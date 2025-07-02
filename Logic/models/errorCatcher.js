@@ -22,7 +22,7 @@ async function err_catcher(func, ...fieldErrors){
       if(field && err.keyValue && Object.keys(err.keyValue)[0] !== field) continue;
       errors[field] = reason;
     }
-    if(err.message.includes('user validation failed')){
+    if(err.errors){
       Object.values(err.errors).forEach(({ properties })=>{
         errors[properties.path] = properties.message;
       });

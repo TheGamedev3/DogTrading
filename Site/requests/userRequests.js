@@ -32,7 +32,7 @@ module.exports = function createRoutes({route}){
         }
     });
     route.preVerified('POST /login', async({inputs, req, json})=>{
-        const [success, result] = await err_catcher(async()=>{
+        return await json(200, async()=>{
             const user = await Owner.login(inputs.email, inputs.password);
             await req.verifyUser(user);
             req.session.message = {
@@ -42,11 +42,6 @@ module.exports = function createRoutes({route}){
             };
             return user;
         });
-        if(success){
-            const user = result; return await json(200, user);
-        }else{
-            return await json(500, result);
-        }
     });
 
     route('POST /logout', async({req, res})=>{

@@ -4,31 +4,104 @@
 
 const {siteEnvironment} = require('@TestSuite');
 
-siteEnvironment('Simulated dog trading scenario', ({expect, Agent, MongooseAPI}) => {
-
-    const {clearAll, seedDatabase} = MongooseAPI;
+siteEnvironment('examine', ({expect, Agent, resetDB}) => {
 
     it('test page fetching', async () => {
-        await clearAll();
-        await seedDatabase();
 
-        const{requester} = Agent();
+        await resetDB();
+        const {requester} = Agent();
 
-        // (each page on the site shows 6 dogs)
-        const page1OfDogs = (await requester("GET /allDogs",{
-            query:{
-                pageX:1,
-                sortStyle: "newest"
+        async function pageTest({
+            route, sortStyle = "oldest", page = 0,
+            index = "name", compareArray,
+            expectSuccess = true
+        }) {
+            const names = (await requester(`GET ${route}`, {
+                query: { page, sortStyle }
+            })).profiles.map(obj => obj[index]);
+
+            if (compareArray) {
+                if (expectSuccess) {
+                    expect(names).to.eql(compareArray);
+                } else {
+                    expect(names).to.not.eql(compareArray);
+                }
             }
-        })).profiles;
-        console.log(page1OfDogs);
-        
+        }
 
-        const ryan = (await requester("GET /UserByName/ryan")).pageUser;
-        console.log(ryan);
+        const testCases = [
 
-        const shamool = (await requester("GET /DogByName/shamool")).dog;
-        console.log(shamool);
+            // (each page on the site shows up to 6 dogs)
+            {
+                route: "/allDogs",
+                sortStyle: "oldest",
+                page: 1,
+                compareArray: ["Jamool", "Shamool", "Cupcake", "Rocket", "Roofus", "Penny"]
+            },
+
+            {
+                route: "/allDogs",
+                sortStyle: "oldest",
+                page: 2,
+                compareArray: ["Zipper", "Maximus", "Muffin", "Sarge", "Peanut"]
+            },
+
+            {
+                route: "/allDogs",
+                sortStyle: "newest",
+                page: 1,
+                compareArray: ["Peanut", "Sarge", "Muffin", "Maximus", "Zipper", "Penny"]
+            },
+
+            // (nothing on page 5)
+            {
+                route: "/allDogs",
+                sortStyle: "oldest",
+                page: 5,
+                compareArray: []
+            },
+
+            {
+                route: "/allDogs",
+                sortStyle: "oldest",
+                page: 1,
+                compareArray: ["Jerry"],
+                expectSuccess: false
+            },
+
+            // (each page on the site shows up to 3 users)
+            {
+                route: "/allUsers",
+                sortStyle: "oldest",
+                page: 1,
+                compareArray: ["Ryan", "Aaron", "Sarah"]
+            },
+
+            {
+                route: "/allUsers",
+                sortStyle: "oldest",
+                page: 2,
+                compareArray: ["Gary", "Maurice", "Laura"]
+            },
+
+            {
+                route: "/allUsers",
+                sortStyle: "newest",
+                page: 1,
+                compareArray: ["Miranda", "Frank", "Laura"]
+            },
+
+            // (each page on the site shows up to 6 offers)
+            {
+                route: "/allOffers",
+                sortStyle: "oldest",
+                page: 1,
+                compareArray: ["Shamool", "Cupcake", "Penny", "Maximus", "Sarge"]
+            }
+
+        ];
+
+        await Promise.all(testCases.map(async(struct)=>pageTest(struct)));
     });
 
 });

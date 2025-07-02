@@ -82,7 +82,8 @@ module.exports={
                             })();
 
                             // check response status
-                            if(assume==='success'){expect(success).to.equal(true)}
+                            if(assume==='any'){}
+                            else if(assume==='success'){expect(success).to.equal(true)}
                             else if(assume==='fail'){expect(success).to.equal(false)}
 
                             if(assumeCode){expect(response).to.have.status(assumeCode)}
@@ -93,7 +94,12 @@ module.exports={
                     }
                 },
 
-                MongooseAPI
+                MongooseAPI,
+                async resetDB(){
+                    const {clearAll, seedDatabase} = MongooseAPI;
+                    await clearAll();
+                    await seedDatabase();
+                }
             });
         });
     }
