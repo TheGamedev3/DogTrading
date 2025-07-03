@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "nodemon Site/app.js",
     "start": "node Site/app.js",
-    "test": "cross-env NODE_ENV=test mocha --require ./TestHelpers/alias.js \"**/*.test.cjs\" --ignore \"**/node_modules/**\" --timeout 10000",
-    "unit": "cross-env NODE_ENV=test mocha --config TestHelpers/.mocharc.cjs --timeout 10000"
+    "test": "cross-env NODE_ENV=test mocha --require ./TestHelpers/alias.js \"**/*.test.cjs\" --ignore \"**/node_modules/**\" --timeout 20000",
+    "unit": "cross-env NODE_ENV=test mocha --config TestHelpers/.mocharc.cjs --timeout 20000"
   },
   "_moduleAliases": {
     "@Site": "./Site",

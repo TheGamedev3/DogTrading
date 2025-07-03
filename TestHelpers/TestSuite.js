@@ -52,10 +52,12 @@ module.exports={
                     return{
                         agent,
                         async requester(fullRoute, argsStruct={}){
-                            const{
+                            let{
                                 query, body,
-                                assume='success', assumeCode
+                                assume, assumeCode
                             } = argsStruct;
+
+                            if(assume===undefined)assume='success';
 
                             // make request sender
                             const{method, route} = parseRoute(fullRoute);
@@ -83,8 +85,14 @@ module.exports={
 
                             // check response status
                             if(assume==='any'){}
-                            else if(assume==='success'){expect(success).to.equal(true)}
-                            else if(assume==='fail'){expect(success).to.equal(false)}
+                            else if(assume==='success'){
+                                if(!success){console.log(`unsuccessful request! (${fullRoute})`, result)}
+                                expect(success).to.equal(true);
+                            }
+                            else if(assume==='fail'){
+                                if(success){console.log(`unintended successful request! (${fullRoute})`, result)}
+                                expect(success).to.equal(false);
+                            }
 
                             if(assumeCode){expect(response).to.have.status(assumeCode)}
 

@@ -27,7 +27,6 @@ createAllRoutes(
     require('./requests/userRequests'),
     require('./requests/dogRequests'),
     require('./requests/tradeRequests'),
-    require('./requests/dataRequests'),
     
     require('./pages/entry'),
     require('./pages/profiles'),
