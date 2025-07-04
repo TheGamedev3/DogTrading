@@ -9,18 +9,19 @@ These deprciated warnings are from the outdated version of chaihttp being used
 
 */
 
-// Run with: npm run unit -- middlewares/__test__/CORS.test.cjs
+// Run with: npm run unit -- Site/middlewares/__test__/CORS.test.cjs
 
 const {siteEnvironment} = require('@TestSuite');
 
 siteEnvironment('CORS Header Test', ({
   link,
-  mainAgent,
+  Agent,
   expect
 }) => {
+  const mainAgent = Agent().agent;
   it('should have CORS headers on OPTIONS preflight', async () => {
     const res = await mainAgent
-      .options('/verified')
+      .options('/home')
       .set('Origin', link)
       .set('Access-Control-Request-Method', 'POST');
 
@@ -31,7 +32,7 @@ siteEnvironment('CORS Header Test', ({
 
   it('should allow cross-origin GET requests', async () => {
     const res = await mainAgent
-      .get('/verified')
+      .get('/home')
       .set('Origin', link);
 
     expect(res).to.have.status(200);
@@ -41,7 +42,7 @@ siteEnvironment('CORS Header Test', ({
 
   it('should NOT allow unauthorized origins', async () => {
     const res = await mainAgent
-      .get('/verified')
+      .get('/home')
       .set('Origin', 'http://unauthorized.com');
 
     // CORS middleware should not add CORS headers for this

@@ -14,7 +14,7 @@
 
 ✅ edit dog or profile
 
-tests, (just stub the return page, by just returning the args given to the page for mocha and chai)
+✅ tests, (just stub the return page, by just returning the args given to the page for mocha and chai)
 
 
 
@@ -24,7 +24,7 @@ tests, (just stub the return page, by just returning the args given to the page 
 
 ✅ edit dog/user profiles, register/create dog
 
-tests
+✅ tests
 
 ✅ pagnation sorter asker thingy
 

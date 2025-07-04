@@ -2,7 +2,7 @@
 
 const { siteEnvironment } = require('@TestSuite');
 
-siteEnvironment('register', ({ expect, Agent, resetDB }) => {
+siteEnvironment('entry', ({ expect, Agent, resetDB }) => {
 
   it('register/create dog test', async () => {
 

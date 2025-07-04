@@ -6,3 +6,5 @@
 3. allow mongo db atlas to use your IP on your local machine, it can change when you power off so you'll have to reenable it!
 4. npm run dev!
 
+
+do "npm run test" to run all tests

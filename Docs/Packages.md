@@ -1,14 +1,5 @@
 
 
-Dogs and Deals need Date Created By
-Iron out the tests so they aren't just logging
-Login Logout
-Dedicated POST and GET routes
-Actual Image Links
-Display Element Pages
-
-
-
 npm install express
 
 npm install bcrypt
@@ -16,7 +7,7 @@ npm install bcrypt
 npm install --save-dev mocha chai
 npm install --save-dev nodemon
 npm install --save-dev chai-http
-# replace the ESM-only release with the old one
+# (replace the ESM-only release with the old one)
 npm uninstall chai
 npm install --save-dev --save-exact chai@4.3.10
 npm uninstall chai-http
@@ -42,3 +33,4 @@ npm install module-alias --save
 npm install ejs
 
 npm install express-session
+

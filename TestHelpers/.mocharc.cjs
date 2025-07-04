@@ -5,7 +5,7 @@
 when running tests DIRECTLY with mocha
 like:
 
-npm run unit -- middlewares/__test__/CORS.test.cjs
+npm run unit -- Site/__test__/edit/editDog.test.cjs
 
 this script, helps expose all the _moduleAliases,
 like '@TestSuite' to the tests!

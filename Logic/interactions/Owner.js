@@ -117,6 +117,7 @@ module.exports = {
             },
 
             async delete(ownerId) {
+                if(!(await this.isReal(ownerId))){throw new FieldError('ownerId', "Owner doesn't exist!")}
                 const { Dog } = require('@Chemicals');
 
                 // Find all dogs of the user

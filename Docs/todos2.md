@@ -39,17 +39,17 @@ today 6/27/2025:
 
 
 7/2/2025 - 7/4/2025
+    ✅ - page request stubs for testing
     ✅ - signup test
     ✅ - login users
     ✅ - edit user page test
     ✅ - create dog test
     ✅ - edit dog test
     ✅ - sell dog test, and trade dog test, delete dog
-    - delete user, check if dog and offer is deleted
-    - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
+    ✅ - delete user, check if dog and offer is deleted
+    ✅ - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
 
 
 - screenshots of the site
 - mongoose offline mode stub
-- page request stubs
 
