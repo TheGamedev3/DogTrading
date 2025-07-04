@@ -14,12 +14,6 @@ module.exports = function createRoutes({route}){
         // use an error catcher thing here later
         return await json(200, async()=>await Dog.modify(params.dogId, inputs));
     });
-    route('PATCH /testPatch', async ({ json, inputs }) => {
-        console.log('✅ PATCH /testPatch hit');
-        console.log('BODY:', inputs);
-        return await json(200, { received: inputs });
-    });
-
 
     route('DELETE /unregisterDog/:dogId', async({userId, json, params})=>{
         // use an error catcher thing here later

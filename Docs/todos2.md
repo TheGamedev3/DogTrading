@@ -35,17 +35,21 @@ today 6/27/2025:
 ✅ - center the pagnation pages, (they're to the left)
 ✅ - describe the outdated cjs code design choices in the docs
 
+✅ - learn how to make mocha and chai tests better
+
+
+7/2/2025 - 7/4/2025
+    ✅ - signup test
+    ✅ - login users
+    ✅ - edit user page test
+    ✅ - create dog test
+    ✅ - edit dog test
+    ✅ - sell dog test, and trade dog test, delete dog
+    - delete user, check if dog and offer is deleted
+    - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
+
+
 - screenshots of the site
 - mongoose offline mode stub
 - page request stubs
-
-✅ - learn how to make mocha and chai tests better
-    - signup test
-    - login users
-    - edit user page test
-    - create dog test
-    - edit dog test
-    - sell dog test, and trade dog test, delete dog
-    - delete user, check if dog and offer is deleted
-    - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
 
