@@ -50,6 +50,8 @@ today 6/27/2025:
     ✅ - explain the purpose of mocha and chai, for testing routes and results primarily, in the docs
 
 
+7/5/2025
+✅ - mongoose offline mode stub
+- describe the miniMongoose mode more (data won't persist, errs don't appear when editing the profile with invalid data, its very buggy, and thus the tests using it wont work, trading does work, feedback is instant, its offline, and its so you don't have to put a mongodb uri link in env to view it)
+- make env reroute to a default env data, with offline turned on
 - screenshots of the site
-- mongoose offline mode stub
-

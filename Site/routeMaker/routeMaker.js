@@ -61,12 +61,14 @@ function createAllRoutes(...routeCreators){
 
                 // Copy only what you need for the frontend
                 for (const [key, value] of Object.entries({...args, message: pageMessage})) {
+                    if(['req', 'res'].includes(key)){continue}
                     if (typeof value === 'object') {
-                    try {
-                        pageArgs[key] = JSON.parse(JSON.stringify(value));
-                    } catch (e) {
-                        pageArgs[key] = null;
-                    }
+                        try {
+                            pageArgs[key] = JSON.parse(JSON.stringify(value));
+                        } catch (e) {
+                            console.warn("FAILED TO JSON", key, e)
+                            pageArgs[key] = null;
+                        }
                     } else {
                     pageArgs[key] = value;
                     }

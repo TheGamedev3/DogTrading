@@ -105,6 +105,7 @@ module.exports = {
                 const pageUser = await this.findOne({ _id: userId }).lean();
                 pageUser.myDogs = await Dog.getIconData(await Dog.DogsOf(pageUser._id, "newest"));
                 pageUser.myOffers = await Offer.getIconData(await Offer.OffersOf(pageUser._id, "newest"));
+                console.log(pageUser, "ABC")
                 return pageUser;
             },
 

@@ -1,9 +1,10 @@
 
 
-let mode = 'online';
+let mode = 'offline';
 if(mode === 'offline'){
     module.exports={
         ...require('./miniMongoose'),
+        ...require('./errorCatcher'),
         ...require('@Seeder')
     }
 }else{

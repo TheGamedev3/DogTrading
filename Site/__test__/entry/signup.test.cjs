@@ -21,7 +21,6 @@ siteEnvironment('entry', ({expect, Agent, resetDB}) => {
             }));
         }
         function expectError(errObject, errIndex, errMsg){
-            if(errIndex === "print"){return console.log(errObject)}
             expect(errObject.err).to.equal(true);
             expect(errObject[errIndex]).to.include(errMsg);
         }

@@ -15,7 +15,7 @@ module.exports = function createRoutes({ Webpage }){
             injectInfo: async({params, setFile})=>{
                 const dogId = params.dogId;
                 const [found, dog] = await err_catcher(async()=>await Dog.pageData(dogId));
-                if(!found){setFile("display/Dog404")}
+                if(!found){setFile("display/Dog404"); console.warn(dog)}
                 return {dog, found, dogId};
             }
         }
@@ -28,7 +28,7 @@ module.exports = function createRoutes({ Webpage }){
             injectInfo: async({userId, params, setFile})=>{
                 const pageUserId = params.userId;
                 const [found, pageUser] = await err_catcher(async()=>await Owner.pageData(pageUserId));
-                if(!found){setFile("display/User404")}
+                if(!found){setFile("display/User404"); console.warn(pageUser)}
                 return {
                     myProfile: userId === pageUserId,
                     pageUserId, pageUser, found

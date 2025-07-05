@@ -9,9 +9,8 @@ module.exports = function Webpage(name, file, args={}){
             ...args
         }
         delete pageArgs.injectInfo;
-        const injectInfo = args.injectInfo;
-        if(injectInfo){
-            const extraInfo = await injectInfo({
+        if(args.injectInfo){
+            const extraInfo = await args.injectInfo({
                 ...pageArgs, 
                 setFile(newFile){file = newFile},
                 redirectTo(destination){pageArgs.redirect = destination}

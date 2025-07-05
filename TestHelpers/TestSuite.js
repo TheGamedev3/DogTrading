@@ -86,11 +86,11 @@ module.exports={
                             // check response status
                             if(assume==='any'){}
                             else if(assume==='success'){
-                                if(!success){console.log(`unsuccessful request! (${fullRoute})`, result)}
+                                if(!success){console.warn(`unsuccessful request! (${fullRoute})`, result)}
                                 expect(success).to.equal(true);
                             }
                             else if(assume==='fail'){
-                                if(success){console.log(`unintended successful request! (${fullRoute})`, result)}
+                                if(success){console.warn(`unintended successful request! (${fullRoute})`, result)}
                                 expect(success).to.equal(false);
                             }
 
