@@ -43,10 +43,6 @@ module.exports={
                 expect,
 
                 // agents let chai save/use cookies
-                mainAgent: chai.request.agent(app),
-                createAgent:()=>chai.request.agent(app),
-
-                // agents let chai save/use cookies
                 Agent(){
                     const agent = chai.request.agent(app);
                     return{

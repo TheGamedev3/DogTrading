@@ -5,6 +5,10 @@ This project is split into two main sections:
 - **Logic** — handles all server-side logic and database storage.  
 - **Site** — handles routing, requests, and rendering pages for the client.
 
+There's also:
+
+- **TestHelpers** — which contains all the shorthand code the mocha and chai tests use to easily access and interact with routes
+
 ---
 
 ## 💽 Logic
