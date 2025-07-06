@@ -7,6 +7,7 @@ module.exports = function createRoutes({ Webpage }){
     // route the user's page to their user Id
     const{Owner, Dog} = require('@Chemicals');
     const { err_catcher } = require('@MongooseAPI');
+    const testMode = process.env.NODE_ENV === 'test';
 
     Webpage(
         "/DogProfile/:dogId",
@@ -15,7 +16,10 @@ module.exports = function createRoutes({ Webpage }){
             injectInfo: async({params, setFile})=>{
                 const dogId = params.dogId;
                 const [found, dog] = await err_catcher(async()=>await Dog.pageData(dogId));
-                if(!found){setFile("display/Dog404"); console.warn(dog)}
+                if(!found){
+                    setFile("display/Dog404");
+                    if(!testMode)console.warn(pageUser);
+                }
                 return {dog, found, dogId};
             }
         }
@@ -28,7 +32,10 @@ module.exports = function createRoutes({ Webpage }){
             injectInfo: async({userId, params, setFile})=>{
                 const pageUserId = params.userId;
                 const [found, pageUser] = await err_catcher(async()=>await Owner.pageData(pageUserId));
-                if(!found){setFile("display/User404"); console.warn(pageUser)}
+                if(!found){
+                    setFile("display/User404");
+                    if(!testMode)console.warn(pageUser);
+                }
                 return {
                     myProfile: userId === pageUserId,
                     pageUserId, pageUser, found
@@ -42,7 +49,6 @@ module.exports = function createRoutes({ Webpage }){
         "display/CreateDog"
     );
 
-    const testMode = process.env.NODE_ENV === 'test';
     if(testMode){
         // exclusive test mode routes for easy of use/debugging redirectTo
         Webpage(

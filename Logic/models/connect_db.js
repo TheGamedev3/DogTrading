@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 module.exports.onConnect=async function(){
 
     let uri = process.env.MONGODB_URI;
+    if(!uri){throw new Error("ENV NOT CONFIGURED WITH A MONGO_DB URI!\nrun with 'npm run mini' to run the preview version instead")}
     const testMode = process.env.NODE_ENV === 'test';
 
     // use the "_test" database if in .env test mode

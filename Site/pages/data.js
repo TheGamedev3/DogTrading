@@ -9,11 +9,7 @@ module.exports = function createRoutes({PagerPage}){
 
     PagerPage('allUsers', 'All Users', Owner, 3);
 
-    // dont forget the cascader
     PagerPage('allDogs', 'All Dogs', Dog, 6);
-
-    // make it so u can edit the dogs if you own them, or your own profile
-    // make a person profile info function
 
     PagerPage('allOffers', 'All Offers', Offer, 6,
         {status:'available'},
@@ -26,10 +22,10 @@ module.exports = function createRoutes({PagerPage}){
                 as: 'dog'
             }
             },
-            { $unwind: '$dog' }
+            { $unwind: '$dog' },
+            { $addFields: { name: '$dog.name' } } // makes the dog's name, the offer's "name"
         ]
     );
 
-    // custom sort props also needed like { status: "avaliable" }
 
 };

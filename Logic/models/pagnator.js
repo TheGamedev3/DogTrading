@@ -11,8 +11,8 @@ async function pagnation({
   const sortMap = {
     newest: { created: -1 },
     oldest: { created: 1 },
-    name_asc: { 'dog.name': 1 },
-    name_desc: { 'dog.name': -1 }
+    name_asc: { name: 1 },
+    name_desc: { name: -1 }
   };
   const sortStage = sortMap[sortStyle] || { created: -1 };
 

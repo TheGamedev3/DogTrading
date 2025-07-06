@@ -66,9 +66,7 @@ module.exports = {
           const dog = await Dog.findOne({ _id: offer.dog });
           if(dog.owner.toString() === buyerId.toString())throw new FieldError('buyerId', "Buyer already owns this dog!");
 
-          // const dogTransfered =
           await Dog.setOwner(offer.dog, buyerId);
-          // console.log('dog transfered', dogTransfered)
           offer.status = 'purchased';
           offer.buyer = buyerId;
           await offer.save();

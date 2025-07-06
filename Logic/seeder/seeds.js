@@ -54,7 +54,7 @@ module.exports = [
   owner('Maurice', 'ZXCVB123', 2),
     dog('Maximus', 'lab', true),
 
-  owner('Laura', '0987654', 4),
+  owner('Laura', '0987654', 3),
     dog('Muffin', 'poodle', false),
 
   owner('Frank', '5%5%123', 2),

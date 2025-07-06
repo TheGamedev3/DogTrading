@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "main": "Site/app.js",
   "scripts": {
-    "dev": "nodemon Site/app.js",
+    "dev":   "nodemon Site/app.js",
     "start": "node Site/app.js",
-    "test": "cross-env NODE_ENV=test mocha --require ./TestHelpers/alias.js \"**/*.test.cjs\" --ignore \"**/node_modules/**\" --timeout 20000",
-    "unit": "cross-env NODE_ENV=test mocha --config TestHelpers/.mocharc.cjs --timeout 20000"
+
+    "mini":  "cross-env DB_MODE=offline NODE_ENV=development nodemon Site/app.js",
+
+    "test":  "cross-env NODE_ENV=test mocha --require ./TestHelpers/alias.js \"**/*.test.cjs\" --ignore \"**/node_modules/**\" --timeout 20000",
+    "unit":  "cross-env NODE_ENV=test mocha --config TestHelpers/.mocharc.cjs --timeout 20000"
   },
   "_moduleAliases": {
     "@Site": "./Site",
